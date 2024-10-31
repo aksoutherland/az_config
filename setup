@@ -21,5 +21,6 @@ git clone https://github.com/aksoutherland/az_config
 cd ~/az_config
 # now we are going to put the into the correct folder and make them executable
 mv bin/* ~/bin
+cd ~
 sudo chmod +x bin/*
 
