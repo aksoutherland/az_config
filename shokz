@@ -1,0 +1,40 @@
+#!/bin/bash
+# this script will allow me to change the audio profile on my Shokz Opencomm Headset
+usage () {
+        echo
+        echo "USAGE: $0 <MODE>"
+        echo
+        echo "When running this script, you need to supply 1 argument"
+        echo
+        echo "<MODE> will be either hfp for handsfree or a2dp for media"
+	echo
+        echo "Please re-run the command with the proper argument"
+        echo
+        echo "EXAMPLE COMMAND: shokz hfp / shokz a2dp / shokz list"
+        echo
+}
+
+case $1 in
+a2dp)
+	echo "Setting headset mode to a2dp"
+	pactl set-card-profile bluez_card.20_74_CF_5B_50_29 a2dp_sink
+	pacmd set-default-sink bluez_sink.20_74_CF_5B_50_29.a2dp_sink
+	echo "Shokz Audio profile has been changed to a2dp_sink"
+	;;	
+hfp)
+	echo "Setting headset mode to HFP/HSP"
+	pactl set-card-profile bluez_card.20_74_CF_5B_50_29 handsfree_head_unit
+	pacmd set-default-sink bluez_sink.20_74_CF_5B_50_29.headset_head.unit
+	echo "Shokz Audio profile has been changed to handsfree_head_unit"
+	;;
+list)
+	echo "This is your current profile"
+	pacmd list-sinks | grep 20_74_CF_5B_50_29
+	;;
+*) 
+        echo
+        usage
+        exit
+	;;
+esac 
+

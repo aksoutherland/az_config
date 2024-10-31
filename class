@@ -29,8 +29,6 @@ SEAT=$3
 
 # ALL OF THE VARIABLES YOU SEE NEXT ARE USED TO CONFIGURE THE VM DURING DEPLOYMENT
 #
-# would like to make script inject these settings into the vm_template file based on the course that is selected as an argument
-# this is the default VM Size
 # this will vary depending on the course you are deploying
 #
 # Common Options:
@@ -48,6 +46,8 @@ VM_SIZE_hae311=Standard_D32s_v3
 VM_SIZE_kub201=Standard_D16s_v3
 VM_SIZE_kub211=Standard_D32s_v3
 VM_SIZE_ran201=Standard_D32s_v3
+VM_SIZE_neu201=Standard_D32s_v3
+VM_SIZE_neu211=Standard_D32s_v3
 VM_SIZE_ran211=Standard_D32s_v3
 VM_SIZE_sle201=Standard_D4s_v3
 VM_SIZE_sle301=Standard_D4s_v3
@@ -91,7 +91,7 @@ VM_DISK_SIZE_neu211="330"
 VM_DISK_SIZE_lhn201="330"
 VM_DISK_SIZE_ran201="330"
 VM_DISK_SIZE_ran211="330"
-VM_DISK_SIZE_sle201="180"
+VM_DISK_SIZE_sle201="130"
 VM_DISK_SIZE_sle301="180"
 VM_DISK_SIZE_smgr201="600"
 VM_DISK_SIZE_smgr211="980"
@@ -99,8 +99,7 @@ VM_DISK_SIZE="130"
 
 #
 # Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
-# this will change the correct entries in the vm template file
-# using the variables listed above
+# this will change the correct entries in the vm template file using the variables listed above
 # these variables will need to be changed to something more appropriate
 #
 sub1=VM_DISK_SIZE_${COURSE}	
@@ -116,13 +115,15 @@ usage () {
 	echo
 	echo "When running this script, you need to supply 3 arguments,"
 	echo
-	echo "1. the action, "create" to deploy a class environment, or "delete" to destroy a class environment"
+	echo "1. The action, "create" to deploy a class environment, or "delete" to destroy a class environment"
 	echo
-	echo "2. the name of the course you wish to either deploy or destroy."
+	echo "2. The name of the course you wish to either create or delete."
 	echo
-	echo "3. the number of stations you wish to create in your azure env"
+	echo "3. The number of stations you wish to create in your azure env"
 	echo
-	echo "Please rerun the command with the proper arguments"
+	echo "Please re-run the command with the proper arguments"
+	echo
+	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0"
 	echo
 }
 
@@ -130,8 +131,8 @@ usage () {
 if [ -z "${ACTION}" ] 
 then
 	echo
-	echo "you are missing you action command"
-	echo "please specify either create or delete as your action"
+	echo "You are missing you action command"
+	echo "Please specify either create or delete as your action"
 	echo 
 	usage
 	exit
@@ -139,8 +140,8 @@ then
 elif [ -z "${COURSE}" ]
 then
 	echo
-	echo "you are missing the course"
-	echo "please specify the course code for the course you want to create or delete"
+	echo "You are missing the course"
+	echo "Please specify the course code for the course you want to create or delete"
 	echo 
 	usage
 	exit
@@ -148,10 +149,10 @@ then
 elif [ -z "${SEAT}" ]
 then
 	echo
-	echo "you are missing the count"
-	echo "please specify the number of stations you wish to create"
-	echo "if deleteing a class, set the count to 0"
-	echo "don't forget to create an extra station for demos"
+	echo "You are missing the count"
+	echo "Please specify the number of stations you wish to create"
+	echo "If deleteing a class, set the count to 0"
+	echo "Don't forget to create an extra station for demos"
 	echo
 	usage
 	exit
