@@ -1,11 +1,11 @@
 #!/bin/bash
-# Use this script to put all of the bits into place to deploy a class
+# Use this script to put all of the bits in place to deploy a class
 # First we need to install git
 sudo zypper install -y git
 # now we create the proper directories
 mkdir ~/lab_setup ~/az_config
 # here we are going to clone ron's projects into the appropriate folder
-# these folders are needed as they provide the scripts needed to configure your station and to deploy a class in azure
+# these projects are needed as they provide the scripts needed to configure your station and to deploy a class in azure
 cd ~/lab_setup
 git clone https://github.com/roncterry/install_lab_env
 git clone https://github.com/roncterry/configure-as-labmachine
@@ -19,7 +19,7 @@ sudo zypper install --from azure-cli azure-cli
 # now we can grab the rest of the needed files
 git clone https://github.com/aksoutherland/az_config
 cd ~/az_config
-# now we are going to put the appropriate files in the correct folder and set them as executable
+# now we are going to put the into the correct folder and make them executable
 mv bin/* ~/bin
 sudo chmod +x bin/*
 
