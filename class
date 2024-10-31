@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-
+# Here we are going to set some env variables to work with
 # we have 4 working directories set as environment variables
 # this location is where we find the scrip to create the azure env
 # ideally this command should be in your path
