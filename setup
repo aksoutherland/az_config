@@ -15,7 +15,7 @@ git clone https://github.com/roncterry/azure-course-tools
 cd ~
 sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo zypper addrepo --name 'Azure CLI' --check https://packages.microsoft.com/yumrepos/azure-cli azure-cli
-sudo zypper install --from azure-cli azure-cli
+sudo zypper install -y --from azure-cli azure-cli
 # now we can grab the rest of the needed files
 git clone https://github.com/aksoutherland/az_config
 cd ~/az_config
