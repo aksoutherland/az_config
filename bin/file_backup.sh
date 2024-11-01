@@ -12,7 +12,7 @@ echo ""
 echo ""
 sudo rsync -rav --progress /mnt/4T_USB/Packaged/ /mnt/nfs/packaged/ 2>/dev/null
 cd /home/$USER/
-sudo rsync -rav --progress Documents bin workbench Downloads ISO lab_setup SUSE Videos /mnt/nfs/backup 2>/dev/null
+sudo rsync -rav --progress Documents bin git workbench Downloads ISO lab_setup SUSE Videos /mnt/nfs/backup 2>/dev/null
 #now we unmount the remote  filesystem
 echo "unMounting remote filesystem"
 echo ""
