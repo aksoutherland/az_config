@@ -191,6 +191,15 @@ create_course () {
 	echo 
 	echo "Your course has been deployed"
 	echo 
+        echo "To power off all VMs, run the following command"
+        echo "for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv);do az vm deallocate -g ${COURSE}-${REGION} -n $i; done"
+        echo
+        echo "To power your VMs on, run the following command"
+        echo "for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv);do az vm start -g ${COURSE}-${REGION} -n $i; done"
+        echo
+        echo "To restart your VMs, run the following command"
+        echo "for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv);do az vm restart -g ${COURSE}-${REGION} -n $i; done"
+        echo
 }
 
 delete_course () {
