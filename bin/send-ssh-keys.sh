@@ -34,7 +34,6 @@ case $1 in
 $CLASS)
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do 
-	#echo sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh-copy-id -f tux@${server};
 	sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
 	done
 	;;
