@@ -7,7 +7,8 @@
 # !!!for this script to work you will need to install the sshpass package using the command "sudo zypper in sshpass"!!!
 #
 CLASS="$1"
-FILENAME="$2"
+FILE="$2"
+PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\")
 usage () {
         echo
         echo "USAGE: $0 <class> <filename>"
@@ -34,11 +35,13 @@ then
 fi
 
 case $2 in
-${FILENAME})
+${FILE})
+	for FILE in "${@:2}"
+	do echo $FILE
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do
-	sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") scp -o StrictHostKeyChecking=accept-new $FILENAME tux@${server}:/home/tux/
-	echo "File Copied"
+	sshpass -p $PASSWD scp -o StrictHostKeyChecking=accept-new $FILE tux@${server}:/home/tux/
+done
 done
 	;;
 *) 
@@ -47,4 +50,3 @@ done
 	exit
 	;;
 esac
-
