@@ -25,17 +25,17 @@ usage () {
         echo
         echo "USAGE: $0 <class> <action>"
         echo
-        echo "When running this script, we specify 2 argument to declare the class and the snapshot action"
+        echo "When running this script, we specify 2 arguments to declare the class and the snapshot action"
 	echo 
 	echo "The first argument will specify the lab environment and the second argument will specify the snapshot action"
 	echo
 	echo "The third option if used will allow you to specify the name of the snapshot you are creating/deleting/reverting"
 	echo
-	echo "The frouth option if used will allow you to set a description for the snapshot"
+	echo "The fourth option if used will allow you to set a description for the snapshot"
         echo
-        echo "Please re-run the command using the proper argument"
+        echo "Please re-run the command using the proper arguments"
         echo
-        echo "EXAMPLE COMMAND: vm-lab-snapshot.sh sle201 create/delete/list/revert mysnapshotname mydescription"
+        echo "EXAMPLE COMMAND: $0 sle201 create/delete/list/revert mysnapshotname mydescription"
 	echo 
 	echo "The snapshot name and description are not required"
         echo
