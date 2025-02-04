@@ -8,6 +8,9 @@
 # $CLASS is the course - we use this to grab the passwd from the class script
 # $1 will be used to define the class
 #
+# this is the command we use to get the password from the class script - you may have to change the path to the class script
+# grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\"
+#
 CLASS=$1
 # here we define the usage
 usage () {
@@ -28,10 +31,9 @@ then
 	usage
 
 fi
-# this is the command we use to get the password from the class script - you may have to change the path to the class script
-# grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\"
 case $1 in
 $CLASS)
+# here we gather the lab vm IP's and then push our local keyeach of the lab stations
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do 
 	sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
