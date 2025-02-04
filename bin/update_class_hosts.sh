@@ -29,13 +29,19 @@ fi
 case $1 in
 add) 
 # the first step is to back up your /etc/hosts file
-sudo cp /etc/hosts /etc/hosts-pre_class
+	sudo cp /etc/hosts /etc/hosts-pre_class
 # now we need to get a list of stations from azure and append them to your existing /etc/hosts file
-az vm list-ip-addresses --output table | awk '{print $2,$1}' | egrep -v 'Public|----' | sudo tee -a /etc/hosts
+	az vm list-ip-addresses --output table | awk '{print $2,$1}' | egrep -v 'Public|----' | sudo tee -a /etc/hosts
+	echo
+	echo "Your HOSTS files has been updated"
+	echo
 	;;
 remove)
 # here we restore /etc/hosts back to its original state
-sudo cp /etc/hosts-pre_class /etc/hosts
+	sudo cp /etc/hosts-pre_class /etc/hosts
+	echo
+	echo "Your HOSTS file has been restored"
+	echo
 	;;
 *)
 	echo 
