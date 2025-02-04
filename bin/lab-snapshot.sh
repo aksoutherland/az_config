@@ -1,5 +1,8 @@
 #!/bin/bash
 #
+# !!! the sshpass package is required for this to work, you can install sshpass with this command !!!
+# sudo zypper in sshpass
+#
 # this script will connect to your lab vm and create vm snapshots
 # here we will grab the class name so that we know what password to use to connect to the vm
 #
