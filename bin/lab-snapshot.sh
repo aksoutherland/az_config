@@ -19,7 +19,7 @@ CLASS="$1"
 ACTION="$2"
 SNAPNAME="$3"
 DESCRIPTION="$4"
-
+PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\")
 # here we define the usage
 usage () {
         echo
@@ -44,9 +44,14 @@ usage () {
 
 # We set the variables if they are not specified when the command is run
 	
+if [ -z "$1" ]
+then
+	usage
+fi
+
 if [ -z "$2" ]
 then 
-	ACTION=list
+	usage
 fi
 
 if [ -z "$3" ]
@@ -66,7 +71,7 @@ case $2 in
 list)
 # this is where we list the snapshots
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh tux@${server} "bash -s" << \EOF
+	do sshpass -p ${PASSWD} ssh tux@${server} "bash -s" << \EOF
  	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name);
  	do virsh snapshot-list $NAME; done
 EOF
@@ -75,7 +80,7 @@ EOF
 create)
 # this is where we create the snapshots
         for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh tux@${server} "bash -s" << \EOF
+	do sshpass -p ${PASSWD} ssh tux@${server} "bash -s" << \EOF
         for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name);
         do virsh snapshot-create-as --domain $NAME --name "$SNAPNAME" --description "$DESCRIPTION"; done
 EOF
@@ -84,7 +89,7 @@ EOF
 delete)
 # this is where we delete the snapshots
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh tux@${server} "bash -s" << \EOF
+	do sshpass -p ${PASSWD} ssh tux@${server} "bash -s" << \EOF
         for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name);
         do virsh snapshot-delete --domain $NAME "$SNAPNAME" ; done
 EOF
@@ -93,7 +98,7 @@ EOF
 revert)
 # this is where we revert the snapshots
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh tux@${server} "bash -s" << \EOF
+	do sshpass -p ${PASSWD} ssh tux@${server} "bash -s" << \EOF
         for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name);
         do virsh snapshot-revert --domain $NAME "$SNAPNAME" ; done
 EOF

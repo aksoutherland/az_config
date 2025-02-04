@@ -12,6 +12,7 @@
 # grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\"
 #
 CLASS=$1
+PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\")
 # here we define the usage
 usage () {
         echo
@@ -36,7 +37,7 @@ $CLASS)
 # here we gather the lab vm IP's and then push our local keyeach of the lab stations
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do 
-	sshpass -p $(grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\") ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
+	sshpass -p ${PASSWD} ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
 	done
 	;;
 *) 
