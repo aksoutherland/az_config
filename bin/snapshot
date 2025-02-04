@@ -41,13 +41,11 @@ create)
 # here we create and list the snapshots
 	echo 
 	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-create-as --domain $NAME --name "$SNAPNAME" --description "$DESCRIPTION"; done
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-list $NAME ; done
 	;;
 delete)
 # here we delete and list the snapshots
 	echo
 	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-delete --domain $NAME "$SNAPNAME" ; done
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-list $NAME ; done
 	;;
 list)
 # here we list the snapshots
@@ -59,7 +57,6 @@ revert)
 # here we revert and list the snapshots
         echo
 	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-revert --domain $NAME "$SNAPNAME" ; done
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-list $NAME ; done
 	;;
 *)
         echo
