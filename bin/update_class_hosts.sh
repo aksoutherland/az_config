@@ -39,6 +39,7 @@ add)
 remove)
 # here we restore /etc/hosts back to its original state
 	sudo cp /etc/hosts-pre_class /etc/hosts
+	cp /home/$USER/.ssh/known_hosts.backup /home/$USER/.ssh/known_hosts
 	echo
 	echo "Your HOSTS file has been restored"
 	echo

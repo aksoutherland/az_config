@@ -35,8 +35,10 @@ fi
 case $1 in
 $CLASS)
 # here we gather the lab vm IP's and then push our local keyeach of the lab stations
+	cp /home/$USER/.ssh/known_hosts /home/$USER/.ssh/known_hosts.backup
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do 
+	ssh-keyscan -H $server >> /home/$USER/.ssh/known_hosts	
 	sshpass -p ${PASSWD} ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
 	done
 	;;
