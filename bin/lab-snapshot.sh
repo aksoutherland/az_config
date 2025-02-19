@@ -78,21 +78,21 @@ list)
 create)
 # this is where we create the snapshots
         for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-create-as --domain $NAME --name "snap01" --description "pre-class"; done'
+	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-create-as --domain $DOMAIN --name $SNAPNAME --description $DESCRIPTION; done'
 EOF
         done
         ;;
 delete)
 # this is where we delete the snapshots
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-delete --domain $NAME "snap01" ; done'
+	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-delete --domain $DOMAIN --name $SNAPNAME ; done'
 EOF
         done
         ;;
 revert)
 # this is where we revert the snapshots
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-revert --domain $NAME "snap01" ; done'
+	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-revert --domain $DOMAIN --name $SNAPNAME ; done'
 EOF
         done
         ;;
