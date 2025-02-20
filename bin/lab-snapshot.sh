@@ -78,7 +78,8 @@ list)
 create)
 # this is where we create the snapshots
         for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-create-as --domain $DOMAIN --name $SNAPNAME --description $DESCRIPTION; done'
+	#do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-create-as --domain $DOMAIN --name $SNAPNAME --description $DESCRIPTION; done'
+	do sshpass -p ${PASSWD} ssh tux@${server} 'virsh list --name --all | while read DOMAIN; do [ -n "$DOMAIN" ] && do virsh snapshot-create-as --domain $DOMAIN --name snap01 --description pre-class; done'
 EOF
         done
         ;;
