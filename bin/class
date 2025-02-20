@@ -16,6 +16,10 @@ VM_TMPL_DIR=/home/$USER/az_config
 # this is the azure resource group config template dir
 AZ_CONFIG_DIR=/home/$USER/az_config/config
 
+# this is the template config directory
+# do not forget to doublecheck all of the values in your template file
+TMPL_CONFIG=/home/$USER/az_config/templates
+
 # here we are setting our variables for our course deployment
 # action - what are we doing
 ACTION=$1
@@ -57,7 +61,7 @@ VM_SIZE_lhn201=Standard_D16s_v3
 VM_SIZE=Standard_D16s_v3
 
 # default Region where the VM's will be dployed
-# Region options are based on your geogrphic location
+# Region options are based on your geographic location
 # I regularly use: 
 # centralus
 # westus
@@ -91,7 +95,7 @@ VM_DISK_SIZE_neu211="330"
 VM_DISK_SIZE_lhn201="330"
 VM_DISK_SIZE_ran201="330"
 VM_DISK_SIZE_ran211="330"
-VM_DISK_SIZE_sle201="130"
+VM_DISK_SIZE_sle201="180"
 VM_DISK_SIZE_sle301="180"
 VM_DISK_SIZE_smgr201="600"
 VM_DISK_SIZE_smgr211="980"
@@ -115,7 +119,7 @@ usage () {
 	echo
 	echo "When running this script, you need to supply 3 arguments,"
 	echo
-	echo "1. The action, "create" to deploy a class environment, or "delete" to destroy a class environment"
+	echo "1. The action, "create" to deploy a class environment, or "delete" to destroy a class environment, or "template" to create a template"
 	echo
 	echo "2. The name of the course you wish to either create or delete."
 	echo
@@ -123,7 +127,7 @@ usage () {
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0"
+	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class template sle301 0"
 	echo
 }
 
@@ -209,6 +213,13 @@ delete_course () {
 	echo "Your course has been removed"
 	echo
 }
+create_template () {
+        bash ${VM_DIR}/create-azure-vm.sh ${TMPL_CONFIG}/$COURSE-template.azvm
+        az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        echo
+        echo "Your template has been created"
+        echo
+}
 
 main () {
 	echo
@@ -226,6 +237,10 @@ main () {
 		delete)
 			delete_course
 		;;
+                template)
+                         create_template
+                ;;
+		
 	esac
 }
 
