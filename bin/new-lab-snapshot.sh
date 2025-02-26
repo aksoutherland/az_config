@@ -40,7 +40,7 @@ then
 	usage
 
 fi
-#
+# 
 # here we are going to send the snapshot script to each of the lab stations
 #
 for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
