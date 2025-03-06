@@ -243,6 +243,7 @@ update_template () {
 }
 
 create_new_template () { 
+# when using this function be sure to add the appropriate variables to the top of the script for the new template you are creating
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
