@@ -130,7 +130,7 @@ usage () {
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class template sle301 0"
+	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class update-template sle301 0 / class new-template sle201 0"
 	echo
 }
 
@@ -166,7 +166,6 @@ then
 
 fi
 
-
 create_course () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/course-environment.cfg.template ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
@@ -192,15 +191,12 @@ create_course () {
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	done
-
 # there have been issues reported setting the VM password using the template
 # this section will set the password for all of the vm's we just deployed
-
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
 		 az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
 	done
-
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
 	echo 
@@ -227,13 +223,7 @@ delete_course () {
 	echo
 }
 
-#
-# 
-# !!!this function should only be used to update existing templates, not to create new templates for new courses!!!
-#
-#
-#
-create_template () { 
+update_template () { 
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
@@ -242,6 +232,25 @@ create_template () {
 		sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+        bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
+        az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        echo
+        echo "Your template has been created"
+        echo
+}
+
+create_new_template () { 
+	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME=labmachine-images/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=openSUSE_Leap-15.4-desktop-10.0.0-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
@@ -268,10 +277,12 @@ main () {
 		delete)
 			delete_course
 		;;
-                template)
-                         create_template
+                update-template)
+                        update_template
                 ;;
-		
+		new-template)
+			create_new_template
+
 	esac
 }
 
