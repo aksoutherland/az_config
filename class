@@ -186,7 +186,6 @@ create_course () {
 		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	   	sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
  	        sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-student${VM}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	        sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	        sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm

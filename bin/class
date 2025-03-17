@@ -45,6 +45,7 @@ SEAT=$3
 # Standard_D64s_v3 (64 VCPU / 256GB RAM)
 #
 # these are the values to use for the class you are creating
+VM_SIZE_edge211=Standard_D16s_v3
 VM_SIZE_hae321=Standard_D32s_v3
 VM_SIZE_hae311=Standard_D32s_v3
 VM_SIZE_kub201=Standard_D16s_v3
@@ -66,7 +67,7 @@ VM_SIZE=Standard_D16s_v3
 # centralus
 # westus
 # eastus
-REGION=centralus
+REGION="centralus"
 
 # this is where you set the passwords for the course vm's
 # passwords I use for each course are:
@@ -83,6 +84,7 @@ VM_PASSWD_sle301='SL#301P#ssw0rd!'
 VM_PASSWD_smgr201='SM&R201P#ssw0rd!'
 VM_PASSWD_smgr211='SM&R211P#ssw0rd!'
 VM_PASSWD_lhn201='LHN2)!P#ssw0rd!'
+VM_PASSWD_edge211='Ed&3211P#ssw0rd!'
 VM_PASSWD='K$B201P#ssw0rd!'
 
 # this is where you set the disk size required for the lab vm
@@ -99,6 +101,7 @@ VM_DISK_SIZE_sle201="180"
 VM_DISK_SIZE_sle301="180"
 VM_DISK_SIZE_smgr201="600"
 VM_DISK_SIZE_smgr211="980"
+VM_DISK_SIZE_edge211="330"
 VM_DISK_SIZE="130"
 
 #
@@ -127,7 +130,7 @@ usage () {
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class template sle301 0"
+	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class update-template sle301 0 / class new-template sle201 0"
 	echo
 }
 
@@ -163,31 +166,36 @@ then
 
 fi
 
-
 create_course () {
-	bash ${ENV_DIR}/create-course-env-in-azure.sh ${AZ_CONFIG_DIR}/${COURSE}.cfg
 	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/course-environment.cfg.template ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=""/COURSE_RESOURCE_GROUP_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=""/COURSE_STORAGE_ACCOUNT_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=""/COURSE_STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=""/IMAGE_SOURCE_RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=""/IMAGE_SOURCE_STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=""/IMAGE_SOURCE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=""/IMAGE_SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+	bash ${ENV_DIR}/create-course-env-in-azure.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
 	for VM in $( seq 1 ${SEAT})
 	do
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=${COURSE}-${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	   	sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
  	        sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-student${VM}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	        sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	        sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 		bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	done
-
 # there have been issues reported setting the VM password using the template
 # this section will set the password for all of the vm's we just deployed
-
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
 		 az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
 	done
-
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
 	echo 
@@ -213,8 +221,40 @@ delete_course () {
 	echo "Your course has been removed"
 	echo
 }
-create_template () {
-        bash ${VM_DIR}/create-azure-vm.sh ${TMPL_CONFIG}/$COURSE-template.azvm
+
+update_template () { 
+	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+        bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
+        az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        echo
+        echo "Your template has been created"
+        echo
+}
+
+create_new_template () { 
+# when using this function be sure to add the appropriate variables to the top of the script for the new template you are creating
+	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME=labmachine-images/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=openSUSE_Leap-15.4-desktop-10.0.0-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+        bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
         az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
@@ -237,10 +277,12 @@ main () {
 		delete)
 			delete_course
 		;;
-                template)
-                         create_template
+                update-template)
+                        update_template
                 ;;
-		
+		new-template)
+			create_new_template
+
 	esac
 }
 
