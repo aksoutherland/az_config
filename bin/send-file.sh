@@ -40,7 +40,7 @@ ${FILE})
 	do echo $FILE
 	for server in $(az vm list-ip-addresses --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do
-	sshpass -p $PASSWD scp -o StrictHostKeyChecking=accept-new $FILE tux@${server}:/home/tux/
+	sshpass -p $PASSWD scp $FILE tux@${server}:/home/tux/
 	done
 	done
 	echo 
