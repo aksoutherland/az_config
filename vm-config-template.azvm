@@ -27,7 +27,7 @@ STORAGE_ACCOUNT=""
 #
 # Recommended Default: vhds
 #
-STORAGE_CONTAINER_NAME=""
+STORAGE_CONTAINER_NAME="course-disks"
 
 
 # Name of Storage Container containing the source image
@@ -37,7 +37,7 @@ STORAGE_CONTAINER_NAME=""
 #
 # Recommended Default: labmachine-images
 #
-SOURCE_STORAGE_CONTAINER_NAME=""
+SOURCE_STORAGE_CONTAINER_NAME="vhds"
 
 
 # Source image file for the VM
