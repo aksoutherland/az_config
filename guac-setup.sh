@@ -4,16 +4,19 @@
 # the folders being created for caddy are for future use
 sudo zypper in -y podman
 # Now we create the required folders
-sudo mkdir -m 775 -p /podman/guac/home
+sudo mkdir -m 775 -p /podman/guac/home/.guacamole
 sudo mkdir -m 775 -p /podman/postgresql/{data,init}
 sudo mkdir -m 775 -p /podman/guacd/{drive,records}
 sudo mkdir -m 775 -p /podman/caddy/{config,data}
 # Set the ownership on the folders
 sudo chown tux:users -R /podman
-# Create the Guacamole Network
+# now we open the correct ports in the firewall
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+# # Create the Guacamole Network
 podman network create guacamole
 # Initialize the database for Guacamole
-podman run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
+podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
 # Start the required containers starting with postgresql
 podman run -d --name postgresql \
 -v /podman/postgresql/init:/docker-entrypoint-initdb.d \
@@ -33,20 +36,20 @@ podman run -d --name guacd \
 docker.io/guacamole/guacd
 # now for the Guacamole container
 podman run -d --name guacamole \
--e POSTGRES_HOSTNAME=postgresql \
--e POSTGRES_DATABASE=guacamole_db \
--e POSTGRES_USER=guacamole_user \
--e POSTGRES_PASSWORD=some_password \
+-e POSTGRESQL_HOSTNAME=postgresql \
+-e POSTGRESQL_DATABASE=guacamole_db \
+-e POSTGRESQL_USER=guacamole_user \
+-e POSTGRESQL_PASSWORD=some_password \
 -e GUACD_PORT_4822_TCP_ADDR=guacd \
 -e GUACD_PORT_4822_TCP_PORT=4822 \
 -e GUACD_HOSTNAME=guacd \
+-v /podman/guac/home:/etc/guacamole \
 --requires=guacd \
 --requires=postgresql \
 -p 8080:8080 \
 --network=guacamole \
 docker.io/guacamole/guacamole
 # lets make sure linger is enabled for the user tux
-loginctl show-user tux
 loginctl enable-linger tux
 loginctl show-user tux
 # create the folder for the container service files
