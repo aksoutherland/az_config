@@ -797,7 +797,7 @@ INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('rdp', 'rdp
 SELECT * FROM guacamole_connection WHERE connection_name = 'rdp' AND parent_id IS NULL;
 
 -- Add parameters to the new connection
-INSERT INTO guacamole_connection_parameter VALUES (1, 'hostname', 'demo3');
+INSERT INTO guacamole_connection_parameter VALUES (1, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'port', '3389');
 
 -- Create connection
@@ -807,7 +807,7 @@ INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('ssh', 'ssh
 SELECT * FROM guacamole_connection WHERE connection_name = 'ssh' AND parent_id IS NULL;
 
 -- Add parameters to the new connection
-INSERT INTO guacamole_connection_parameter VALUES (2, 'hostname', 'demo3');
+INSERT INTO guacamole_connection_parameter VALUES (2, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (2, 'port', '22');
 
 -- Create default user "guacadmin" with password "guacadmin"
