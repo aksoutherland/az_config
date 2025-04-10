@@ -200,7 +200,7 @@ ENABLE_SSH="true"
 #
 # Space delimited list of additional ports to open.
 #
-ADDITIONAL_OPEN_PORTS=""
+ADDITIONAL_OPEN_PORTS="8080"
 
 
 # Additional CLI arguments
