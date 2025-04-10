@@ -31,9 +31,9 @@ podman network create guacamole
 # Initialize the database for Guacamole
 # podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
 # this command can be used to grab a custom initdb.sql that can be used to initialze the DB for first time use
-wget https://github.com/aksoutherland/az_config/raw/master/initdb.sql -O /podman/postgresql/init/initdb.sql
+wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /podman/postgresql/init/initdb.sql
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
-wget https://github.com/aksoutherland/az_config/raw/master/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
+wget https://github.com/aksoutherland/az_config/raw/master/guac/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
 # here we insert the guacamole server's hostname in the the SQL init script
 sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
 # now we set some variables for the passwords
