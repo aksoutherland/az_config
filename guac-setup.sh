@@ -20,6 +20,7 @@ sudo mkdir -m 775 -p /podman/caddy/{config,data}
 # Set the ownership on the folders
 sudo chown $UID:users -R /podman
 # now we open the correct ports in the firewall
+# rdp and ssh rules can be removed for production use as those are already enabled
 sudo systemctl enable --now firewalld.service
 sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --add-service=rdp --permanent
