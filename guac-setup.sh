@@ -3,12 +3,13 @@
 # Here we make sure that podman is installed
 # the folders being created for caddy are for future use
 # here we are adding the ip/hostname to /etc/hosts
-# first we gather the details
+# first we gather some details to be used further later
 IP=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 NAME=$(hostname)
 # now we put those details into /etc/hosts
 echo $IP  $NAME | sudo tee -a /etc/hosts
 # now we install podman and xrdp if not installed
+# this can be removed when we are ready to use in production
 sudo zypper in -y podman xrdp freerdp-server
 sudo systemctl enable --now xrdp
 # Now we create the required folders
@@ -30,11 +31,15 @@ podman network create guacamole
 # podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
 # this command can be used to grab a custom initdb.sql that can be used to initialze the DB for first time use
 wget https://github.com/aksoutherland/az_config/raw/master/initdb.sql -O /podman/postgresql/init/initdb.sql
+# now we need to grab the file that contains the passwords used by guacamole for the different classes
 wget https://github.com/aksoutherland/az_config/raw/master/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
+# here we insert the guacamole server's hostname in the the SQL init script
 sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
+# now we set some variables for the passwords
 HASH=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f2)
 SALT=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f3)
 CONP=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f4)
+# here we insert those passwords into the SQL init script
 sed -i "s/_PASS_HASH_/${HASH}/g" /podman/postgresql/init/initdb.sql
 sed -i "s/_PASS_SALT_/${SALT}/g" /podman/postgresql/init/initdb.sql
 sed -i "s/_CON_PASS_/${CONP}/g" /podman/postgresql/init/initdb.sql

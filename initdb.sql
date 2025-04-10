@@ -811,7 +811,7 @@ JOIN guacamole_entity          ON permissions.username = guacamole_entity.name A
 JOIN guacamole_entity affected ON permissions.affected_username = affected.name AND guacamole_entity.type = 'USER'
 JOIN guacamole_user            ON guacamole_user.entity_id = affected.entity_id;
 
--- Create connection
+-- Create RDP connection
 INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('rdp', 'rdp');
 
 -- Determine the connection_id
@@ -823,7 +823,7 @@ INSERT INTO guacamole_connection_parameter VALUES (1, 'port', '3389');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'username', 'tux');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'password', '_CON_PASS_');
 
--- Create connection
+-- Create SSH connection
 INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('ssh', 'ssh');
 
 -- Determine the connection_id
