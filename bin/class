@@ -57,7 +57,9 @@ VM_SIZE_ran211=Standard_D32s_v3
 VM_SIZE_sle201=Standard_D4s_v3
 VM_SIZE_sle301=Standard_D4s_v3
 VM_SIZE_smgr201=Standard_D16s_v3
+VM_SIZE_smgr201v5=Standard_D16s_v3
 VM_SIZE_smgr211=Standard_D16s_v3
+VM_SIZE_smgr211v5=Standard_D16s_v3
 VM_SIZE_lhn201=Standard_D16s_v3
 VM_SIZE_sle323=Standard_D16s_v3
 VM_SIZE=Standard_D16s_v3
@@ -83,7 +85,9 @@ VM_PASSWD_ran211='R@N211P#ssw0rd!'
 VM_PASSWD_sle201='SL#201P#ssw0rd!'
 VM_PASSWD_sle301='SL#301P#ssw0rd!'
 VM_PASSWD_smgr201='SM&R201P#ssw0rd!'
+VM_PASSWD_smgr201v5='SM&R201P#ssw0rd!'
 VM_PASSWD_smgr211='SM&R211P#ssw0rd!'
+VM_PASSWD_smgr211v5='SM&R211P#ssw0rd!'
 VM_PASSWD_lhn201='LHN2)!P#ssw0rd!'
 VM_PASSWD_sle323='SL3323!P#ssw0rd!'
 VM_PASSWD_edge211='Ed&3211P#ssw0rd!'
@@ -101,8 +105,10 @@ VM_DISK_SIZE_ran201="330"
 VM_DISK_SIZE_ran211="330"
 VM_DISK_SIZE_sle201="180"
 VM_DISK_SIZE_sle301="180"
-VM_DISK_SIZE_smgr201="600"
+VM_DISK_SIZE_smgr201="700"
+VM_DISK_SIZE_smgr201v5="700"
 VM_DISK_SIZE_smgr211="980"
+VM_DISK_SIZE_smgr211v5="980"
 VM_DISK_SIZE_edge211="330"
 VM_DISK_SIZE_sle323="350"
 VM_DISK_SIZE="130"
@@ -133,7 +139,10 @@ usage () {
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMAND: class create kub201 3 / class delete kub201 0 / class update-template sle301 0 / class new-template sle201 0"
+	echo "EXAMPLE COMMANDS: class create kub201 3"
+	echo "                  class delete kub201 0"
+	echo "                  class update-template sle301 0"
+	echo "                  class new-template sle201 0"
 	echo
 }
 
@@ -198,6 +207,7 @@ create_course () {
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
 		 az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
+		 az vm open-port --resource-group ${COURSE}-${REGION} --name $i --port 8080
 	done
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
@@ -231,8 +241,6 @@ update_template () {
 		sed -i "s/REGION=""/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP="trainingimages"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT="labmachineimagetraining"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
-	#	sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
-	#	sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME="vhds"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE="${COURSE}-template-disk.vhd"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_NAME=""/VM_NAME="${COURSE}-template"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_SIZE=""/VM_SIZE="${!sub3}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
