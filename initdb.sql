@@ -821,7 +821,7 @@ SELECT * FROM guacamole_connection WHERE connection_name = 'rdp' AND parent_id I
 INSERT INTO guacamole_connection_parameter VALUES (1, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'port', '3389');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'username', 'tux');
-INSERT INTO guacamole_connection_parameter VALUES (1, 'password', 'linux');
+INSERT INTO guacamole_connection_parameter VALUES (1, 'password', '_CON_PASS_');
 
 -- Create connection
 INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('ssh', 'ssh');
@@ -833,7 +833,7 @@ SELECT * FROM guacamole_connection WHERE connection_name = 'ssh' AND parent_id I
 INSERT INTO guacamole_connection_parameter VALUES (2, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (2, 'port', '22');
 INSERT INTO guacamole_connection_parameter VALUES (2, 'username', 'tux');
-INSERT INTO guacamole_connection_parameter VALUES (2, 'password', 'linux');
+INSERT INTO guacamole_connection_parameter VALUES (2, 'password', '_CON_PASS_');
 
 -- Grant user tux permissions to use rdp and ssh
 INSERT INTO guacamole_connection_permission VALUES (2, '1', 'READ');
