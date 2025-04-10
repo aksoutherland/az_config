@@ -805,7 +805,7 @@ INSERT INTO guacamole_user_permission (entity_id, affected_user_id, permission)
 SELECT guacamole_entity.entity_id, guacamole_user.user_id, permission::guacamole_object_permission_type
 FROM (
     VALUES
-        ('guacadmin', 'guacadmin', 'READ')
+        ('tux', 'tux', 'READ')
 ) permissions (username, affected_username, permission)
 JOIN guacamole_entity          ON permissions.username = guacamole_entity.name AND guacamole_entity.type = 'USER'
 JOIN guacamole_entity affected ON permissions.affected_username = affected.name AND guacamole_entity.type = 'USER'
