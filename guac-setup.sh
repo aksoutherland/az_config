@@ -17,7 +17,7 @@ sudo mkdir -m 775 -p /podman/postgresql/{data,init}
 sudo mkdir -m 775 -p /podman/guacd/{drive,records}
 sudo mkdir -m 775 -p /podman/caddy/{config,data}
 # Set the ownership on the folders
-sudo chown tux:users -R /podman
+sudo chown $UID:users -R /podman
 # now we open the correct ports in the firewall
 sudo systemctl enable --now firewalld.service
 sudo firewall-cmd --add-port=8080/tcp --permanent
@@ -70,8 +70,8 @@ podman run -d --name guacamole \
 --network=guacamole \
 docker.io/guacamole/guacamole
 # lets make sure linger is enabled for the user tux
-loginctl enable-linger tux
-loginctl show-user tux
+loginctl enable-linger $USER
+loginctl show-user $USER
 # create the folder for the container service files
 mkdir -p ~/.config/systemd/user
 cd ~/.config/systemd/user
