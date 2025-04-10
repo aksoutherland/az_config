@@ -790,6 +790,27 @@ JOIN guacamole_entity          ON permissions.username = guacamole_entity.name A
 JOIN guacamole_entity affected ON permissions.affected_username = affected.name AND guacamole_entity.type = 'USER'
 JOIN guacamole_user            ON guacamole_user.entity_id = affected.entity_id;
 
+-- Create default user "tux" with password "linux"
+INSERT INTO guacamole_entity (name, type) VALUES ('tux', 'USER');
+INSERT INTO guacamole_user (entity_id, password_hash, password_salt, password_date)
+SELECT
+    entity_id,
+    decode('1980B3EAD666FACA2B67A71B9A9C1E0B1E169240BB57DAC998741204B2855D1F', 'hex'),  -- 'linux'
+    decode('CF48AB767543984B0F142068EEE930C0B19DC9905E6E9DF620583008489A977B', 'hex'),
+    CURRENT_TIMESTAMP
+FROM guacamole_entity WHERE name = 'tux' AND guacamole_entity.type = 'USER';
+
+-- Grant read permission to read/update/administer self
+INSERT INTO guacamole_user_permission (entity_id, affected_user_id, permission)
+SELECT guacamole_entity.entity_id, guacamole_user.user_id, permission::guacamole_object_permission_type
+FROM (
+    VALUES
+        ('tux', 'tux', 'READ')
+) permissions (username, affected_username, permission)
+JOIN guacamole_entity          ON permissions.username = guacamole_entity.name AND guacamole_entity.type = 'USER'
+JOIN guacamole_entity affected ON permissions.affected_username = affected.name AND guacamole_entity.type = 'USER'
+JOIN guacamole_user            ON guacamole_user.entity_id = affected.entity_id;
+
 -- Create connection
 INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('rdp', 'rdp');
 
@@ -799,6 +820,8 @@ SELECT * FROM guacamole_connection WHERE connection_name = 'rdp' AND parent_id I
 -- Add parameters to the new connection
 INSERT INTO guacamole_connection_parameter VALUES (1, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (1, 'port', '3389');
+INSERT INTO guacamole_connection_parameter VALUES (1, 'username', 'tux');
+INSERT INTO guacamole_connection_parameter VALUES (1, 'password', 'linux');
 
 -- Create connection
 INSERT INTO guacamole_connection (connection_name, protocol) VALUES ('ssh', 'ssh');
@@ -809,24 +832,9 @@ SELECT * FROM guacamole_connection WHERE connection_name = 'ssh' AND parent_id I
 -- Add parameters to the new connection
 INSERT INTO guacamole_connection_parameter VALUES (2, 'hostname', '_HOSTNAME_');
 INSERT INTO guacamole_connection_parameter VALUES (2, 'port', '22');
+INSERT INTO guacamole_connection_parameter VALUES (2, 'username', 'tux');
+INSERT INTO guacamole_connection_parameter VALUES (2, 'password', 'linux');
 
--- Create default user "guacadmin" with password "guacadmin"
-INSERT INTO guacamole_entity (name, type) VALUES ('tux', 'USER');
-INSERT INTO guacamole_user (entity_id, password_hash, password_salt, password_date)
-SELECT
-    entity_id,
-    decode('CA458A7D494E3BE824F5E1E175A1556C0F8EEF2C2D7DF3633BEC4A29C4411960', 'hex'),  -- 'guacadmin'
-    decode('FE24ADC5E11E2B25288D1704ABE67A79E342ECC26064CE69C5B3177795A82264', 'hex'),
-    CURRENT_TIMESTAMP
-FROM guacamole_entity WHERE name = 'tux' AND guacamole_entity.type = 'USER';
-
--- Grant admin permission to read/update/administer self
-INSERT INTO guacamole_user_permission (entity_id, affected_user_id, permission)
-SELECT guacamole_entity.entity_id, guacamole_user.user_id, permission::guacamole_object_permission_type
-FROM (
-    VALUES
-        ('guacadmin', 'guacadmin', 'READ')
-) permissions (username, affected_username, permission)
-JOIN guacamole_entity          ON permissions.username = guacamole_entity.name AND guacamole_entity.type = 'USER'
-JOIN guacamole_entity affected ON permissions.affected_username = affected.name AND guacamole_entity.type = 'USER'
-JOIN guacamole_user            ON guacamole_user.entity_id = affected.entity_id;
+-- Grant user tux permissions to use rdp and ssh
+INSERT INTO guacamole_connection_permission VALUES (2, '1', 'READ');
+INSERT INTO guacamole_connection_permission VALUES (2, '2', 'READ');
