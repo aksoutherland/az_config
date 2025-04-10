@@ -35,9 +35,9 @@ sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
 HASH=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f2)
 SALT=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f3)
 CONP=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f4)
-sed -i "s/_PASS_HASH_/${HASH}}/g" /podman/postgresql/init/initdb.sql
-sed -i "s/_PASS_SALT_/${SALT}}/g" /podman/postgresql/init/initdb.sql
-sed -i "s/_CON_PASS_/${CONP}}/g" /podman/postgresql/init/initdb.sql
+sed -i "s/_PASS_HASH_/${HASH}/g" /podman/postgresql/init/initdb.sql
+sed -i "s/_PASS_SALT_/${SALT}/g" /podman/postgresql/init/initdb.sql
+sed -i "s/_CON_PASS_/${CONP}/g" /podman/postgresql/init/initdb.sql
 # Start the required containers starting with postgresql
 podman run -d --name postgresql \
 -v /podman/postgresql/init:/docker-entrypoint-initdb.d \
