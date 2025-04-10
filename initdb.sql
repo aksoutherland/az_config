@@ -795,8 +795,8 @@ INSERT INTO guacamole_entity (name, type) VALUES ('tux', 'USER');
 INSERT INTO guacamole_user (entity_id, password_hash, password_salt, password_date)
 SELECT
     entity_id,
-    decode('_COURSE_HASH_', 'hex'),  -- 'linux'
-    decode('_COURSE_PASSWORD_', 'hex'),
+    decode('_PASS_HASH_', 'hex'),  -- 'linux'
+    decode('_PASS_SALT_', 'hex'),
     CURRENT_TIMESTAMP
 FROM guacamole_entity WHERE name = 'tux' AND guacamole_entity.type = 'USER';
 
