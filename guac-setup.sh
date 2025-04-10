@@ -30,7 +30,12 @@ podman network create guacamole
 # podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
 # this command can be used to grab a custom initdb.sql that can be used to initialze the DB for first time use
 wget https://github.com/aksoutherland/az_config/raw/master/initdb.sql -O /podman/postgresql/init/initdb.sql
+wget https://github.com/aksoutherland/az_config/raw/master/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
 sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
+HASH=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f2)
+SALT=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f3)
+sed -i "s/_PASS_HASH_/${HASH}}/g" /podman/postgresql/init/initdb.sql
+sed -i "s/_PASS_SALT_/${SALT}}/g" /podman/postgresql/init/initdb.sql
 # Start the required containers starting with postgresql
 podman run -d --name postgresql \
 -v /podman/postgresql/init:/docker-entrypoint-initdb.d \
