@@ -207,7 +207,6 @@ create_course () {
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
 		 az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
-		 az vm open-port --resource-group ${COURSE}-${REGION} --name $i --port 8080
 	done
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
