@@ -36,8 +36,8 @@ podman run -d --name postgresql \
 -v /podman/postgresql/init:/docker-entrypoint-initdb.d \
 -v /podman/postgresql/data:/var/lib/postgresql/data \
 -v /etc/localtime:/etc/localtime:ro \
--e POSTGRES_USER=guacamole_user \
--e POSTGRES_PASSWORD=some_password \
+-e POSTGRES_USER=guacamole \
+-e POSTGRES_PASSWORD=QvgyQsFQyxcaE78iAV7ppJInA \
 -e POSTGRES_DB=guacamole_db \
 --network=guacamole \
 docker.io/library/postgres:16-alpine
@@ -52,8 +52,8 @@ docker.io/guacamole/guacd
 podman run -d --name guacamole \
 -e POSTGRESQL_HOSTNAME=postgresql \
 -e POSTGRESQL_DATABASE=guacamole_db \
--e POSTGRESQL_USER=guacamole_user \
--e POSTGRESQL_PASSWORD=some_password \
+-e POSTGRESQL_USER=guacamole \
+-e POSTGRESQL_PASSWORD=QvgyQsFQyxcaE78iAV7ppJInA \
 -e GUACD_PORT_4822_TCP_ADDR=guacd \
 -e GUACD_PORT_4822_TCP_PORT=4822 \
 -e GUACD_HOSTNAME=guacd \
