@@ -91,6 +91,8 @@ update_template () {
 		sed -i "s/REGION=.*/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP="trainingimages"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT="labmachineimagetraining"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+                sed -i "s/STORAGE_CONTAINER_NAME=.*/STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+                sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=.*/SOURCE_STORAGE_CONTAINER_NAME="vhds"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/SOURCE_IMAGE_FILE=.*/SOURCE_IMAGE_FILE="${COURSE}-template-disk.vhd"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_NAME=.*/VM_NAME="${COURSE}-template"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_SIZE=.*/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
