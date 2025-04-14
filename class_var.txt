@@ -1,0 +1,83 @@
+# ALL OF THE VARIABLES YOU SEE NEXT ARE USED TO CONFIGURE THE VM DURING DEPLOYMENT
+#
+# this will vary depending on the course you are deploying
+#
+# Common Options:
+# Standard_D2s_v3  (2 VCPU / 8GB RAM)
+# Standard_D4s_v3  (4 VCPU / 16GB RAM)
+# Standard_D8s_v3  (8 VCPU / 32GB RAM)
+# Standard_D16s_v3 (16 VCPU / 64GB RAM)
+# Standard_D32s_v3 (32 VCPU / 128GB RAM)
+# Standard_D48s_v3 (48 VCPU / 192GB RAM)
+# Standard_D64s_v3 (64 VCPU / 256GB RAM)
+#
+# these are the values to use for the class you are creating
+VM_SIZE_edge211=Standard_D16s_v3
+VM_SIZE_hae321=Standard_D32s_v3
+VM_SIZE_hae311=Standard_D32s_v3
+VM_SIZE_kub201=Standard_D16s_v3
+VM_SIZE_kub211=Standard_D32s_v3
+VM_SIZE_ran201=Standard_D32s_v3
+VM_SIZE_neu201=Standard_D32s_v3
+VM_SIZE_neu211=Standard_D32s_v3
+VM_SIZE_ran211=Standard_D32s_v3
+VM_SIZE_sle201=Standard_D4s_v3
+VM_SIZE_sle301=Standard_D4s_v3
+VM_SIZE_smgr201=Standard_D16s_v3
+VM_SIZE_smgr201v5=Standard_D16s_v3 
+VM_SIZE_smgr211=Standard_D16s_v3 
+VM_SIZE_smgr211v5=Standard_D16s_v3 
+VM_SIZE_lhn201=Standard_D16s_v3 
+VM_SIZE_sle323=Standard_D16s_v3 
+VM_SIZE=Standard_D16s_v3 
+
+# default Region where the VM's will be dployed
+# Region options are based on your geographic location
+# I regularly use: 
+# centralus
+# westus
+# eastus
+REGION="centralus"
+
+# this is where you set the passwords for the course vm's
+# passwords I use for each course are:
+VM_PASSWD_hae321='H@3321P#ssw0rd!'
+VM_PASSWD_hae311='H@3311P#ssw0rd!'
+VM_PASSWD_kub201='K$B201P#ssw0rd!'
+VM_PASSWD_kub211='K$B211P#ssw0rd!'
+VM_PASSWD_neu201='N#U201P#ssw0rd!'
+VM_PASSWD_neu211='N#U211P#ssw0rd!'
+VM_PASSWD_ran201='R@N201P#ssw0rd!'
+VM_PASSWD_ran211='R@N211P#ssw0rd!'
+VM_PASSWD_sle201='SL#201P#ssw0rd!'
+VM_PASSWD_sle301='SL#301P#ssw0rd!'
+VM_PASSWD_smgr201='SM&R201P#ssw0rd!'
+VM_PASSWD_smgr201v5='SM&R201P#ssw0rd!'
+VM_PASSWD_smgr211='SM&R211P#ssw0rd!'
+VM_PASSWD_smgr211v5='SM&R211P#ssw0rd!'
+VM_PASSWD_lhn201='LHN2)!P#ssw0rd!'
+VM_PASSWD_sle323='SL3323!P#ssw0rd!'
+VM_PASSWD_edge211='Ed&3211P#ssw0rd!'
+VM_PASSWD='K$B201P#ssw0rd!' 
+
+# this is where you set the disk size required for the lab vm
+VM_DISK_SIZE_hae321="200"
+VM_DISK_SIZE_hae311="200"
+VM_DISK_SIZE_kub201="330"
+VM_DISK_SIZE_kub211="330"
+VM_DISK_SIZE_neu201="330"
+VM_DISK_SIZE_neu211="330"
+VM_DISK_SIZE_lhn201="330"
+VM_DISK_SIZE_ran201="330"
+VM_DISK_SIZE_ran211="330"
+VM_DISK_SIZE_sle201="180"
+VM_DISK_SIZE_sle301="180"
+VM_DISK_SIZE_smgr201="700"
+VM_DISK_SIZE_smgr201v5="700"
+VM_DISK_SIZE_smgr211="980"
+VM_DISK_SIZE_smgr211v5="980"
+VM_DISK_SIZE_edge211="330"
+VM_DISK_SIZE_sle323="350"
+VM_DISK_SIZE="130"
+
+
