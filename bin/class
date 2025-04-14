@@ -1,8 +1,9 @@
 #!/bin/bash
 #
 # Here we source the class variables file
-# we should probably pull the file from git to put it into the correct location here
-#
+# we need to grab the latest version of the class_var.txt file and put it into the correct location
+wget https://github.com/aksoutherland/az_config/raw/master/class_var.txt -O /home/$USER/az_config/class_var.txt
+# now we need to source the file so that we can use the variables to build our class environment
 source /home/$USER/az_config/class_var.txt
 # we have 4 working directories set as environment variables
 # this location is where we find the scrip to create the azure env
