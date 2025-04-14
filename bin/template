@@ -1,0 +1,145 @@
+#!/bin/bash
+#
+# Here we source the class variables file
+# we should probably pull the file from git to put it into the correct location here
+#
+source /home/$USER/az_config/class_var.txt
+
+# we have 4 working directories set as environment variables
+# this location is where we find the scrip to create the azure env
+# ideally this command should be in your path
+ENV_DIR=/home/$USER/lab_setup/azure-course-tools
+
+# this is where we find the script to create the VM's
+# ideally this command should be in your path
+VM_DIR=/home/$USER/lab_setup/create-azure-vm
+
+# this is the VM template dir
+VM_TMPL_DIR=/home/$USER/az_config
+
+# this is the azure resource group config template dir
+AZ_CONFIG_DIR=/home/$USER/az_config/config
+
+# this is the template config directory
+# do not forget to doublecheck all of the values in your template file
+TMPL_CONFIG=/home/$USER/az_config/templates
+
+# here we are setting our variables for our course deployment
+# action - what are we doing
+ACTION=$1
+
+# this is the course that we are working with
+COURSE=$2
+
+# this is the number of stations that we will be deploying
+SEAT=$3
+
+#
+# Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
+# this will change the correct entries in the vm template file using the variables listed above
+# these variables will need to be changed to something more appropriate
+#
+sub1=VM_DISK_SIZE_${COURSE}	
+sub2=VM_PASSWD_${COURSE}	
+sub3=VM_SIZE_${COURSE}	
+#
+#
+
+# the usage section needs to be updated to reflect actual usage for template updates and creation
+# the third variable is not needed here
+usage () {
+	echo
+	echo "USAGE: $0 <action> <course>"
+	echo
+	echo "When running this script, you need to supply 2 arguments,"
+	echo
+	echo "1. The action, "update-template" to update an existing template"
+	echo "or "new-template" to create a new template"
+	echo
+	echo "2. The name of the course you are working with"
+	echo
+	echo "Please re-run the command with the proper arguments"
+	echo
+	echo "EXAMPLE COMMANDS: class update-template sle301 0"
+	echo "                  class new-template sle201 0"
+	echo
+}
+
+
+if [ -z "${ACTION}" ] 
+then
+	echo
+	echo "You are missing you action command"
+	echo "Please specify either create or delete as your action"
+	echo 
+	usage
+	exit
+
+elif [ -z "${COURSE}" ]
+then
+	echo
+	echo "You are missing the course"
+	echo "Please specify the course code for the course you want to create or delete"
+	echo 
+	usage
+	exit
+fi
+
+update_template () { 
+	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/REGION=""/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP="trainingimages"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT="labmachineimagetraining"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE="${COURSE}-template-disk.vhd"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_NAME=""/VM_NAME="${COURSE}-template"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_SIZE=""/VM_SIZE="${!sub3}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE="${!sub1}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+ 	echo bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
+        echo az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        echo
+        echo "Your template has been created"
+        echo
+}
+
+new_template () { 
+# when using this function be sure to add the appropriate variables to the top of the script for the new template you are creating
+	mkdir ${VM_TMPL_DIR}/${COURSE}
+		cp ${VM_TMPL_DIR}/vm-config-template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/STORAGE_CONTAINER_NAME=""/STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=""/SOURCE_STORAGE_CONTAINER_NAME=labmachine-images/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=openSUSE_Leap-15.4-desktop-10.0.0-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+        echo bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
+        echo az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        echo
+        echo "Your template has been created"
+        echo
+}
+
+main () {
+	echo
+	echo "Action..............: ${ACTION}"
+	echo "Course Code.........: ${COURSE}"
+	echo "Station Count.......: ${SEAT}"
+	echo "==========================="
+	echo
+	echo
+	
+	case ${ACTION} in 
+                update-template)
+                        update_template
+                ;;
+		new-template)
+			create_new_template
+
+	esac
+}
+
+
+main
