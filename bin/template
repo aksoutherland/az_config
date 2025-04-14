@@ -53,15 +53,15 @@ usage () {
 	echo
 	echo "When running this script, you need to supply 2 arguments,"
 	echo
-	echo "1. The action, "update-template" to update an existing template"
-	echo "or "new-template" to create a new template"
+	echo "1. The action, "update" to update an existing template"
+	echo "or "new" to create a new template"
 	echo
 	echo "2. The name of the course you are working with"
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMANDS: template update-template sle301 0"
-	echo "                  template new-template sle201 0"
+	echo "EXAMPLE COMMANDS: template update sle301 0"
+	echo "                  template new sle201 0"
 	echo
 }
 
@@ -95,8 +95,8 @@ update_template () {
 		sed -i "s/VM_NAME=""/VM_NAME="${COURSE}-template"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_SIZE=""/VM_SIZE="${!sub3}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE="${!sub1}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
- 	echo bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
-        echo az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+ 	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
+        az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
         echo
@@ -115,8 +115,8 @@ new_template () {
 		sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-template/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
-        echo bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
-        echo az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
+        bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE/}$COURSE-vm-template.azvm
+        az vm user update --resource-group trainingimages --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
         echo
@@ -132,10 +132,10 @@ main () {
 	echo
 	
 	case ${ACTION} in 
-                update-template)
+                update)
                         update_template
                 ;;
-		new-template)
+		new)
 			create_new_template
 
 	esac
