@@ -60,8 +60,8 @@ usage () {
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
-	echo "EXAMPLE COMMANDS: class update-template sle301 0"
-	echo "                  class new-template sle201 0"
+	echo "EXAMPLE COMMANDS: template update-template sle301 0"
+	echo "                  template new-template sle201 0"
 	echo
 }
 
