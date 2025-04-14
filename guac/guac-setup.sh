@@ -1,36 +1,23 @@
 #!/bin/bash
 # This script will setup Guacamole on the host
-# Here we make sure that podman is installed
-# the folders being created for caddy are for future use
-# here we are adding the ip/hostname to /etc/hosts
-# first we gather some details to be used further later
+# first we gather some details to be used later
 IP=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 NAME=$(hostname)
 # now we put those details into /etc/hosts
 echo $IP  $NAME | sudo tee -a /etc/hosts
-# now we install podman and xrdp if not installed
-# this can be removed when we are ready to use in production
-sudo zypper in -y podman xrdp freerdp-server
-sudo systemctl enable --now xrdp
 # Now we create the required folders
 sudo mkdir -m 775 -p /podman/guac/home/.guacamole
 sudo mkdir -m 775 -p /podman/postgresql/{data,init}
 sudo mkdir -m 775 -p /podman/guacd/{drive,records}
-sudo mkdir -m 775 -p /podman/caddy/{config,data}
 # Set the ownership on the folders
 sudo chown $UID:users -R /podman
-# now we open the correct ports in the firewall
-# rdp and ssh rules can be removed for production use as those are already enabled
+# now we  make sure the firewal is enabled and started, then we open the correct ports in the firewall for guac
 sudo systemctl enable --now firewalld.service
 sudo firewall-cmd --add-port=8080/tcp --permanent
-sudo firewall-cmd --add-service=rdp --permanent
-sudo firewall-cmd --add-service=ssh --permanent
 sudo firewall-cmd --reload
 # # Create the Guacamole Network
 podman network create guacamole
 # Initialize the database for Guacamole
-# podman run --rm docker.io/guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /podman/postgresql/init/initdb.sql
-# this command can be used to grab a custom initdb.sql that can be used to initialze the DB for first time use
 wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /podman/postgresql/init/initdb.sql
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
 wget https://github.com/aksoutherland/az_config/raw/master/guac/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
