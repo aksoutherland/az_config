@@ -1,9 +1,8 @@
 #!/bin/bash
 #
-# Here we download the class variables file
-# 
-wget https://github.com/aksoutherland/az_config/raw/master/class_var.txt -O /home/$USER/az_config/class_var.txt
-# now we source the file for use further down
+# Here we source the class variables file
+# we should probably pull the file from git to put it into the correct location here
+#
 source /home/$USER/az_config/class_var.txt
 # we have 4 working directories set as environment variables
 # this location is where we find the scrip to create the azure env
@@ -99,45 +98,45 @@ fi
 create_course () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/course-environment.cfg.template ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=""/COURSE_RESOURCE_GROUP_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=""/COURSE_STORAGE_ACCOUNT_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=""/COURSE_STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=""/IMAGE_SOURCE_RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=""/IMAGE_SOURCE_STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=""/IMAGE_SOURCE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=""/IMAGE_SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-	echo bash ${ENV_DIR}/create-course-env-in-azure.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/REGION=.*/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=.*/COURSE_RESOURCE_GROUP_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=.*/COURSE_STORAGE_ACCOUNT_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=.*/COURSE_STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=.*/IMAGE_SOURCE_RESOURCE_GROUP=trainingimages/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=.*/IMAGE_SOURCE_STORAGE_ACCOUNT=labmachineimagetraining/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=.*/IMAGE_SOURCE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=.*/IMAGE_SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+	bash ${ENV_DIR}/create-course-env-in-azure.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
 	for VM in $( seq 1 ${SEAT})
 	do
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/REGION=""/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/RESOURCE_GROUP=""/RESOURCE_GROUP=${COURSE}-${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/STORAGE_ACCOUNT=""/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	   	sed -i "s/SOURCE_IMAGE_FILE=""/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
- 	        sed -i "s/VM_NAME=""/VM_NAME=${COURSE}-student${VM}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	        sed -i "s/VM_SIZE=""/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/VM_DISK_SIZE=""/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		echo bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		sed -i "s/REGION=.*/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP=${COURSE}-${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+	   	sed -i "s/SOURCE_IMAGE_FILE=.*/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+ 	        sed -i "s/VM_NAME=.*/VM_NAME=${COURSE}-student${VM}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+	        sed -i "s/VM_SIZE=.*/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	done
 # there have been issues reported setting the VM password using the template
 # this section will set the password for all of the vm's we just deployed
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
-		 echo az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
+	az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
 	done
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
 	echo 
-	echo az vm list-ip-addresses --output table
+	az vm list-ip-addresses --output table
 	echo 
 	echo "Your course has been deployed"
 	echo
 }
 
 delete_course () {
-	echo az group delete -n ${COURSE}-${REGION}
-	echo rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
+	az group delete -n ${COURSE}-${REGION}
+	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
 	echo
 	echo "Your course has been removed"
 	echo

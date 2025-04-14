@@ -27,7 +27,7 @@ STORAGE_ACCOUNT=""
 #
 # Recommended Default: vhds
 #
-STORAGE_CONTAINER_NAME="vhds"
+STORAGE_CONTAINER_NAME=""
 
 
 # Name of Storage Container containing the source image
@@ -37,7 +37,7 @@ STORAGE_CONTAINER_NAME="vhds"
 #
 # Recommended Default: labmachine-images
 #
-SOURCE_STORAGE_CONTAINER_NAME="course-disks"
+SOURCE_STORAGE_CONTAINER_NAME=""
 
 
 # Source image file for the VM
@@ -71,7 +71,7 @@ SOURCE_IMAGE_URI="https://${STORAGE_ACCOUNT}.blob.core.windows.net/${SOURCE_STOR
 #
 # Default: linux
 #
-OS_TYPE=""
+OS_TYPE="linux"
 
 
 # The name of the VM
