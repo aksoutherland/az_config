@@ -138,7 +138,7 @@ create_course () {
 # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
 	echo 
-	az vm list-ip-addresses --output table
+	az vm list-ip-addresses -g ${COURSE}-${REGION} --output table
 	echo 
 	echo "Your course has been deployed"
 	echo
