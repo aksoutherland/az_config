@@ -236,7 +236,7 @@ open_additional_ports() {
     for PORT in ${ADDITIONAL_OPEN_PORTS}
     do
       echo -e "${LTGREEN}COMMAND: ${GRAY}az vm open-port --resource-group ${RESOURCE_GROUP} --name ${VM_NAME} --port ${PORT}${NC}"
-      az vm open-port --resource-group ${RESOURCE_GROUP} --name ${VM_NAME} --port ${PORT} --priority 1010 #> /dev/null 2>&1
+      az vm open-port --resource-group ${RESOURCE_GROUP} --name ${VM_NAME} --port ${PORT} --priority 1010 > /dev/null 2>&1
     done
     echo
   fi
