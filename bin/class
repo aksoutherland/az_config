@@ -12,7 +12,7 @@ fi
 # now we need to source the file so that we can use the variables to build our class environment
 source /home/$USER/az_config/class_var.txt
 # we have 4 working directories set as environment variables
-# this location is where we find the scrip to create the azure env
+# this location is where we find the scripts to create the azure env
 # ideally this command should be in your path
 ENV_DIR=/home/$USER/lab_setup/azure-course-tools
 #
@@ -22,13 +22,6 @@ VM_DIR=/home/$USER/lab_setup/create-azure-vm
 #
 # this is the VM template dir
 VM_TMPL_DIR=/home/$USER/az_config
-#
-# this is the azure resource group config template dir
-AZ_CONFIG_DIR=/home/$USER/az_config/config
-#
-# this is the template config directory
-# do not forget to doublecheck all of the values in your template file
-TMPL_CONFIG=/home/$USER/az_config/templates
 #
 # here we are setting our variables for our course deployment
 # action - what are we doing
