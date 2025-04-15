@@ -2,7 +2,13 @@
 #
 # Here we source the class variables file
 # we need to grab the latest version of the class_var.txt file and put it into the correct location
-wget https://github.com/aksoutherland/az_config/raw/master/class_var.txt -O /home/$USER/az_config/class_var.txt
+FILE=/home/$USER/az_config/class_var.txt
+if [ -f ${FILE} ];
+then
+	echo "class_var.txt exists"
+else
+	wget https://github.com/aksoutherland/az_config/raw/master/class_var.txt -O /home/$USER/az_config/class_var.txt
+fi
 # now we need to source the file so that we can use the variables to build our class environment
 source /home/$USER/az_config/class_var.txt
 # we have 4 working directories set as environment variables
