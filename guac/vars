@@ -1,5 +1,10 @@
 # this section contains the passwords, hashes and salts used to configure guacamole
 # please do not modify
+# the first column is the courseid
+# the second column is the password
+# the third column id the password hash
+# the fourth column is the password in plain text
+# the last line is the password for the guacamole user for the postgresql database and the guacadmin account
 hae321|788a9b689bfac44f9499a0e13fec92588ff0c24c7afbd5351e20d195f551f5dd|d2ca6e814cf14d77ddf930164fcd5a1d57db8d9bca71636badf4754ec10a4a04|H@3321P#ssw0rd!
 hae311|e98c75392ed52a1fdfdb9f8f32e0cede68cb4edd7d6f367eacf07a08924bda9e|7085627cbc8b1de92abfdcb665e442d2139c243c9500d855e746b488edad2ec6|H@3311P#ssw0rd!
 kub201|15c9fee9e33f2f03c4e6fed21768644f4dee867b4cc447cf390bf7501ee21af2|0512dea9c88590e522f2216bdeaea77ac0a03de58c2912b12361a5f2b5403dbf|K$B201P#ssw0rd!
