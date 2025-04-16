@@ -1,7 +1,7 @@
 #!/bin/bash
-#
-# we should probably pull the file from git to put it into the correct location here
-# we need to grab the latest version of the class_var.txt file and put it into the correct location
+# this script is used to update and/or create new templates for the class environments
+# before creating a new template please make sure you have added the appropriate variables to the class_var.txt file
+# we need to to make sure we have the latest version of the class_var.txt file in the correct location
 FILE=/home/$USER/az_config/class_var.txt
 if [ -f ${FILE} ];
 then
@@ -12,53 +12,45 @@ fi
 
 # now we need to source the file so that we can use the variables to build our class environment
 source /home/$USER/az_config/class_var.txt
+
 # we have 4 working directories set as environment variables
 # this is where we find the script to create the VM's
 VM_DIR=/home/$USER/lab_setup/create-azure-vm
-
 # this is the VM template dir
 VM_TMPL_DIR=/home/$USER/az_config
 
 # here we are setting our variables for our course deployment
 # action - what are we doing
 ACTION=$1
-
 # this is the course that we are working with
 COURSE=$2
 
 # here we get the resource group name
 export RG="$(az group list -o table | sed -n '3 p' | cut -d " " -f1)"
-
 # here we get the storage account name
 export ACCOUNT="$(az storage account list -o table | sed -n '4 p' | awk '{ print $9 }')"
-
 # here we get the storage key
 export KEY="$(az storage account keys list --account-name ${ACCOUNT} --output table 2> /dev/null | grep "key1" | awk '{ print $4 }')"
 
-#
 # Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
 # this will change the correct entries in the vm template file using the variables listed above
-# these variables will need to be changed to something more appropriate
-#
 sub1=VM_DISK_SIZE_${COURSE}	
 sub2=VM_PASSWD_${COURSE}	
 sub3=VM_SIZE_${COURSE}	
-#
-#
 
-# the usage section needs to be updated to reflect actual usage for template updates and creation
-# the third variable is not needed here
 usage () {
 	echo
 	echo "USAGE: $0 <action> <course>"
 	echo
 	echo "When running this script, you need to supply 2 arguments,"
 	echo
-	echo "1. The action, "update" to update an existing template"
-	echo "or "new" to create a new template"
-	echo "or "publish" to publish the template"
+	echo "The first argument will specify the "Action" you wish to perform"
+	echo "     A. Use "update" to update an existing template"
+	echo "     B. Use "new" to create a new template"
+	echo "     C. Use "publish" to publish the template"
+	echo "     D. Use "delete" to delete a template" 
 	echo
-	echo "2. The name of the course you are working with"
+	echo "The second argument will be the name of the course you are working with"
 	echo
 	echo "Please re-run the command with the proper arguments"
 	echo
@@ -73,8 +65,8 @@ usage () {
 if [ -z "${ACTION}" ] 
 then
 	echo
-	echo "You are missing you action command"
-	echo "Please specify either create or delete as your action"
+	echo "You are missing the action command"
+	echo "Please specify either appropriate action"
 	echo 
 	usage
 	exit
@@ -83,7 +75,7 @@ elif [ -z "${COURSE}" ]
 then
 	echo
 	echo "You are missing the course"
-	echo "Please specify the course code for the course you want to create or delete"
+	echo "Please specify the course code for the course you want to work with"
 	echo 
 	usage
 	exit
@@ -102,6 +94,7 @@ update_template () {
 		sed -i "s/VM_SIZE=.*/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
  	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
+	# here we set the password for the newly created vm
         az vm user update -g ${RG} --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
@@ -109,7 +102,8 @@ update_template () {
 }
 
 new_template () { 
-# when using this function be sure to add the appropriate variables to the class_var.txt file for the new template you are creating
+# NOTE: when using this function be sure to add the appropriate variables to the class_var.txt file for the new template you are creating
+# NOTE: otherwise this function will fail
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/REGION=.*/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
@@ -122,6 +116,7 @@ new_template () {
 		sed -i "s/VM_SIZE=.*/VM_SIZE="${!sub3}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE="${!sub1}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
         bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
+	# here we set the password for the newly created vm
         az vm user update -g ${RG} --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
@@ -133,7 +128,7 @@ publish_template () {
 	az vm deallocate -g ${RG} -n ${COURSE}-template
 	# now we need to delete the VM
 	az vm delete -g ${RG} -n ${COURSE}-template -y
-	# now we can move the vhd to the correct folder
+	# now we can move the vhd to the correct container
 	az storage blob copy start \
 	--account-name ${ACCOUNT} \
 	--account-key ${KEY} \
@@ -143,18 +138,20 @@ publish_template () {
 	--source-account-key ${KEY} \
 	--source-container course-disks \
 	--source-blob ${COURSE}-template-disk.vhd
-	# command to remove the original vhd once the vhd has been copied to the correct location
-	# the below command needs to be tested
+	# here we are deleting the vhd from the working container so that we do not have duplicates
 	az storage blob delete \
 	--account-name ${ACCOUNT} \
 	--account-key ${KEY} \
 	--container-name course-disks \
 	--name ${COURSE}-template-disk.vhd
-	# now we need to remvove the rest of the VM files
+	# now we need to remove the rest of the VM files
         az network nic delete -g ${RG} --name ${COURSE}-templateVMNic
         az network public-ip delete -g ${RG} --name ${COURSE}-templatePublicIP
         az network nsg delete -g ${RG} --name ${COURSE}-templateNSG
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
+        echo
+        echo "Your template has been published "
+        echo
 }
 
 delete_template () {
@@ -168,13 +165,13 @@ delete_template () {
         --account-key ${KEY} \
         --container-name course-disks \
         --name ${COURSE}-template-disk.vhd
-        # now we need to remvove the rest of the VM files
+        # now we need to remove the rest of the VM files
         az network nic delete -g ${RG} --name ${COURSE}-templateVMNic
         az network public-ip delete -g ${RG} --name ${COURSE}-templatePublicIP
         az network nsg delete -g ${RG} --name ${COURSE}-templateNSG
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
 	echo 
-	echo "Your VM has been removed"
+	echo "Your template has been removed"
 	echo
 }
 

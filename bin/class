@@ -1,7 +1,6 @@
 #!/bin/bash
-#
-# Here we source the class variables file
-# we need to grab the latest version of the class_var.txt file and put it into the correct location
+# this script is used to either create or delete a class lab environment in azure
+# we need to make sure we have the latest version of the class_var.txt file in the correct location
 FILE=/home/$USER/az_config/class_var.txt
 if [ -f ${FILE} ];
 then
@@ -9,27 +8,23 @@ then
 else
 	wget https://github.com/aksoutherland/az_config/raw/master/class_var.txt -O /home/$USER/az_config/class_var.txt
 fi
-# now we need to source the file so that we can use the variables to build our class environment
+
+# now we need to source the file so that contains the variables needed to create our class environment
 source /home/$USER/az_config/class_var.txt
+
 # we have 4 working directories set as environment variables
 # this location is where we find the scripts to create the azure env
-# ideally this command should be in your path
 ENV_DIR=/home/$USER/lab_setup/azure-course-tools
-#
 # this is where we find the script to create the VM's
-# ideally this command should be in your path
 VM_DIR=/home/$USER/lab_setup/create-azure-vm
-#
 # this is the VM template dir
 VM_TMPL_DIR=/home/$USER/az_config
-#
-# here we are setting our variables for our course deployment
+
+# here we are setting the variables for the course deployment
 # action - what are we doing
 ACTION=$1
-#
 # this is the course that we are working with
 COURSE=$2
-#
 # this is the number of stations that we will be deploying
 SEAT=$3
 
@@ -39,17 +34,10 @@ export RG="$(az group list -o table | sed -n '3 p' | cut -d " " -f1)"
 # here we get the storage account name
 export ACCOUNT="$(az storage account list -o table | sed -n '4 p' | awk '{ print $9 }')"
 
-#
 # Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
-# this will change the correct entries in the vm template file using the variables listed above
-# these variables will need to be changed to something more appropriate
-#
 sub1=VM_DISK_SIZE_${COURSE}	
 sub2=VM_PASSWD_${COURSE}	
 sub3=VM_SIZE_${COURSE}	
-#
-#
-
 
 usage () {
 	echo
@@ -69,7 +57,6 @@ usage () {
 	echo "                  class delete kub201 0"
 	echo
 }
-
 
 if [ -z "${ACTION}" ] 
 then
@@ -128,14 +115,12 @@ create_course () {
 		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
 	done
-# there have been issues reported setting the VM password using the template
-# this section will set the password for all of the vm's we just deployed
+        # there have been issues reported setting the VM password using the template so we use this instead to set the passwords
 	for i in $(az vm list -g ${COURSE}-${REGION} --query [].[name] --output tsv)
 	do 
 	az vm user update --resource-group ${COURSE}-${REGION} --name $i --username tux --password ${!sub2}
 	done
-# now we want to get a list of all of the IP's for the VM's so that we can share them with the class
-	echo 
+        # now we want to get a list of all of the IP's for the VM's so that we can share them with the class
 	echo 
 	az vm list-ip-addresses -g ${COURSE}-${REGION} --output table
 	echo 
@@ -150,7 +135,6 @@ delete_course () {
 	echo "Your course has been removed"
 	echo
 }
-
 
 main () {
 	echo
@@ -171,6 +155,5 @@ main () {
 
 	esac
 }
-
 
 main
