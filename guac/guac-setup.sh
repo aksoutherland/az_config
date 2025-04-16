@@ -33,7 +33,7 @@ sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
 HASH=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f2)
 SALT=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f3)
 CONP=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f4)
-GUACDB=$(grep guacdb /podman/postgresql/vars | cut -d "|" -f2)
+export GUACDB=$(grep guacdb /podman/postgresql/vars | cut -d "|" -f2)
 # here we insert those passwords into the SQL init script
 sed -i "s/_PASS_HASH_/${HASH}/g" /podman/postgresql/init/initdb.sql
 sed -i "s/_PASS_SALT_/${SALT}/g" /podman/postgresql/init/initdb.sql
