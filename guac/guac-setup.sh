@@ -20,13 +20,13 @@ podman network create guacamole
 # here we grab the file to Initialize the database for Guacamole and put it in the correct location
 wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /podman/postgresql/init/initdb.sql
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
-wget https://github.com/aksoutherland/az_config/raw/master/guac/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
+wget https://github.com/aksoutherland/az_config/raw/master/guac/vars -O /podman/postgresql/vars
 # here we insert the guacamole server's hostname in the the SQL init script
 sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
 # now we set some variables for the passwords
-HASH=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f2)
-SALT=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f3)
-CONP=$(grep ${NAME} /podman/postgresql/guac-passwords.txt | cut -d "|" -f4)
+HASH=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f2)
+SALT=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f3)
+CONP=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f4)
 # here we insert those passwords into the SQL init script
 sed -i "s/_PASS_HASH_/${HASH}/g" /podman/postgresql/init/initdb.sql
 sed -i "s/_PASS_SALT_/${SALT}/g" /podman/postgresql/init/initdb.sql
@@ -79,6 +79,7 @@ systemctl --user daemon-reload > /dev/null 2>&1
 systemctl --user enable container-postgresql.service > /dev/null 2>&1
 systemctl --user enable container-guacd.service > /dev/null 2>&1
 systemctl --user enable container-guacamole.service > /dev/null 2>&1
+rm /podman/postgresql/vars > /dev/null 2>&1
 echo
 echo
 echo "Guacamole has been successfully configured"
