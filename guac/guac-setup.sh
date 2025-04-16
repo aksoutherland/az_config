@@ -9,6 +9,12 @@ echo $IP  $NAME | sudo tee -a /etc/hosts
 sudo mkdir -m 775 -p /podman/guac/home/.guacamole
 sudo mkdir -m 775 -p /podman/postgresql/{data,init}
 sudo mkdir -m 775 -p /podman/guacd/{drive,records}
+# now we make sure that podman is installed
+sudo zypper in -y podman
+# now we make make sure subuids and subgids are setup
+sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 tux
+# now we activate the changes
+podman system migrate
 # Set the ownership on the folders
 sudo chown $UID:users -R /podman
 # now we  make sure the firewall is enabled and started, then we open the correct ports in the firewall for guac
