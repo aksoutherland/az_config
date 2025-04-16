@@ -17,7 +17,7 @@ sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
 # Create the Guacamole Network
 podman network create guacamole
-# here we grab the file to Initialize the database for Guacamole and put it in the correct location
+# here we grab the file used to initialize the database for Guacamole and put it in the correct location
 wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /podman/postgresql/init/initdb.sql
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
 wget https://github.com/aksoutherland/az_config/raw/master/vars -O /podman/postgresql/.vars
@@ -80,7 +80,7 @@ systemctl --user daemon-reload > /dev/null 2>&1
 systemctl --user enable container-postgresql.service > /dev/null 2>&1
 systemctl --user enable container-guacd.service > /dev/null 2>&1
 systemctl --user enable container-guacamole.service > /dev/null 2>&1
-rm /podman/postgresql/vars > /dev/null 2>&1
+rm /podman/postgresql/.vars > /dev/null 2>&1
 echo
 echo
 echo "Guacamole has been successfully configured"

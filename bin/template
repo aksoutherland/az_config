@@ -2,16 +2,16 @@
 # this script is used to update and/or create new templates for the class environments
 # before creating a new template please make sure you have added the appropriate variables to the class_var.txt file
 # we need to to make sure we have the latest version of the class_var.txt file in the correct location
-FILE=/home/$USER/az_config/.vars
+FILE=/home/$USER/az_config/vars
 if [ -f ${FILE} ];
 then
         echo "vars exists"
 else
-        wget https://github.com/aksoutherland/az_config/raw/master/vars -O /home/$USER/az_config/.vars
+        wget https://github.com/aksoutherland/az_config/raw/master/vars -O /home/$USER/az_config/vars
 fi
 
 # now we need to source the file so that we can use the variables to build our class environment
-source /home/$USER/az_config/.vars
+source /home/$USER/az_config/vars
 
 # we have 4 working directories set as environment variables
 # this is where we find the script to create the VM's
