@@ -11,13 +11,13 @@ sudo mkdir -m 775 -p /podman/postgresql/{data,init}
 sudo mkdir -m 775 -p /podman/guacd/{drive,records}
 # Set the ownership on the folders
 sudo chown $UID:users -R /podman
-# now we  make sure the firewal is enabled and started, then we open the correct ports in the firewall for guac
+# now we  make sure the firewall is enabled and started, then we open the correct ports in the firewall for guac
 sudo systemctl enable --now firewalld.service
 sudo firewall-cmd --add-port=8080/tcp --permanent
 sudo firewall-cmd --reload
-# # Create the Guacamole Network
+# Create the Guacamole Network
 podman network create guacamole
-# Initialize the database for Guacamole
+# here we grab the file to Initialize the database for Guacamole and put it in the correct location
 wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /podman/postgresql/init/initdb.sql
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
 wget https://github.com/aksoutherland/az_config/raw/master/guac/guac-passwords.txt -O /podman/postgresql/guac-passwords.txt
@@ -62,19 +62,25 @@ podman run -d --name guacamole \
 -p 8080:8080 \
 --network=guacamole \
 docker.io/guacamole/guacamole
-# lets make sure linger is enabled for the user tux
+# lets make sure linger is enabled for the user tux so that we can have the containers start at bootup
 loginctl enable-linger $USER
 loginctl show-user $USER
 # create the folder for the container service files
 mkdir -p ~/.config/systemd/user
 cd ~/.config/systemd/user
 # now we create the container service files
-podman generate systemd --files --name postgresql
-podman generate systemd --files --name guacd
-podman generate systemd --files --name guacamole
-# reload systemctl user daemon
-systemctl --user daemon-reload
+podman generate systemd --files --name postgresql > /dev/null 2>&1
+podman generate systemd --files --name guacd > /dev/null 2>&1
+podman generate systemd --files --name guacamole > /dev/null 2>&1
+cd ~
+# reload systemctl user daemon so that the newly created service files are seen by systemd
+systemctl --user daemon-reload > /dev/null 2>&1
 # finally, enable the container service files so that containers will start at boot
-systemctl --user enable container-postgresql.service 
-systemctl --user enable container-guacd.service 
-systemctl --user enable container-guacamole.service 
+systemctl --user enable container-postgresql.service > /dev/null 2>&1
+systemctl --user enable container-guacd.service > /dev/null 2>&1
+systemctl --user enable container-guacamole.service > /dev/null 2>&1
+echo
+echo
+echo "Guacamole has been successfully configured"
+echo
+echo

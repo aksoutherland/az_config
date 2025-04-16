@@ -19,7 +19,8 @@ sudo zypper install -y --from azure-cli azure-cli
 # now we can grab the rest of the needed files
 git clone https://github.com/aksoutherland/az_config
 cd ~/az_config
-# now we are going to put the files into the correct folder and make them executable
+# now we are going to put the scripts into the correct folder and make them executable
 mv bin/* ~/bin
 sudo chmod +x ~/bin/*
-
+# you now have everything needed to be able to deploy classes in azure
+# for these script to work, you will need to authenticate to azure using "az login"
