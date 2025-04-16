@@ -86,6 +86,7 @@ systemctl --user daemon-reload > /dev/null 2>&1
 systemctl --user enable container-postgresql.service > /dev/null 2>&1
 systemctl --user enable container-guacd.service > /dev/null 2>&1
 systemctl --user enable container-guacamole.service > /dev/null 2>&1
+# now remove the vars file as it is no longer needed and to sort of protect the passwords
 rm /podman/postgresql/.vars > /dev/null 2>&1
 echo
 echo
