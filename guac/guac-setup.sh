@@ -30,10 +30,10 @@ wget https://github.com/aksoutherland/az_config/raw/master/guac/vars -O /podman/
 # here we insert the guacamole server's hostname in the the SQL init script
 sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
 # now we set some variables for the passwords
-HASH=$(grep guac-${NAME} /podman/postgresql/vars | cut -d "|" -f2)
-SALT=$(grep guac-${NAME} /podman/postgresql/vars | cut -d "|" -f3)
-CONP=$(grep guac-${NAME} /podman/postgresql/vars | cut -d "|" -f4)
-GUACDB=$(grep guac-db /podman/postgresql/vars | cut -d "|" -f2)
+HASH=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f2)
+SALT=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f3)
+CONP=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f4)
+GUACDB=$(grep guacdb /podman/postgresql/vars | cut -d "|" -f2)
 # here we insert those passwords into the SQL init script
 sed -i "s/_PASS_HASH_/${HASH}/g" /podman/postgresql/init/initdb.sql
 sed -i "s/_PASS_SALT_/${SALT}/g" /podman/postgresql/init/initdb.sql
