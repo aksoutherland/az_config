@@ -1,7 +1,7 @@
 #!/bin/bash
 # this script is used to update and/or create new templates for the class environments
-# before creating a new template please make sure you have added the appropriate variables to the class_var.txt file
-# we need to to make sure we have the latest version of the class_var.txt file in the correct location
+# before creating a new template please make sure you have added the appropriate variables vars file
+# we need to to make sure we have the latest version of the vars file in the correct location
 FILE=/home/$USER/az_config/vars
 if [ -f ${FILE} ];
 then
@@ -102,7 +102,7 @@ update_template () {
 }
 
 new_template () { 
-# NOTE: when using this function be sure to add the appropriate variables to the var file for the new template you are creating
+# NOTE: when using this function be sure to add the appropriate variables to the vars file for the new template you are creating
 # NOTE: otherwise this function will fail
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
