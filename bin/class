@@ -1,6 +1,6 @@
 #!/bin/bash
 # this script is used to either create or delete a class lab environment in azure
-# we need to make sure we have the latest version of the class_var.txt file in the correct location
+# we need to make sure we have the latest version of the vars file in the correct location
 FILE=/home/$USER/az_config/vars
 if [ -f ${FILE} ];
 then
