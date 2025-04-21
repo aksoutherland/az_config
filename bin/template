@@ -102,7 +102,7 @@ update_template () {
 }
 
 new_template () { 
-# NOTE: when using this function be sure to add the appropriate variables to the class_var.txt file for the new template you are creating
+# NOTE: when using this function be sure to add the appropriate variables to the var file for the new template you are creating
 # NOTE: otherwise this function will fail
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
