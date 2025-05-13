@@ -1,5 +1,5 @@
 # ALL OF THE VARIABLES YOU SEE NEXT ARE USED TO CONFIGURE THE VM DURING DEPLOYMENT
-#
+# rename to az_config.cfg
 # this will vary depending on the course you are deploying
 #
 # Common Options:
