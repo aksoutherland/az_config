@@ -1,0 +1,108 @@
+podman exec -it postgresql /bin/bash
+psql -U guacamole_user -W guacamole_db
+\d
+select * from guacamole_connection;
+guacamole_db=# select * from guacamole_entity;
+ entity_id |   name    | type
+-----------+-----------+------
+         1 | guacadmin | USER
+         2 | tux       | USER
+(2 rows)
+
+select * from guacamole_connection_parameter;
+ connection_id | parameter_name | parameter_value 
+---------------+----------------+-----------------
+             2 | hostname       | 192.168.122.237
+             2 | password       | linux
+             2 | port           | 22
+             2 | username       | tux
+             1 | hostname       | 192.168.122.237
+             1 | password       | linux
+             1 | port           | 3389
+             1 | security       | any
+             1 | ignore-cert    | true
+             1 | username       | tux
+\q
+
+
+ public | guacamole_connection                                    | table    | guacamole_user
+ public | guacamole_connection_attribute                          | table    | guacamole_user
+ public | guacamole_connection_connection_id_seq                  | sequence | guacamole_user
+ public | guacamole_connection_group                              | table    | guacamole_user
+ public | guacamole_connection_group_attribute                    | table    | guacamole_user
+ public | guacamole_connection_group_connection_group_id_seq      | sequence | guacamole_user
+ public | guacamole_connection_group_permission                   | table    | guacamole_user
+ public | guacamole_connection_history                            | table    | guacamole_user
+ public | guacamole_connection_history_history_id_seq             | sequence | guacamole_user
+ public | guacamole_connection_parameter                          | table    | guacamole_user
+ public | guacamole_connection_permission                         | table    | guacamole_user
+ public | guacamole_entity                                        | table    | guacamole_user
+ public | guacamole_entity_entity_id_seq                          | sequence | guacamole_user
+ public | guacamole_sharing_profile                               | table    | guacamole_user
+ public | guacamole_sharing_profile_attribute                     | table    | guacamole_user
+ public | guacamole_sharing_profile_parameter                     | table    | guacamole_user
+ public | guacamole_sharing_profile_permission                    | table    | guacamole_user
+ public | guacamole_sharing_profile_sharing_profile_id_seq        | sequence | guacamole_user
+ public | guacamole_system_permission                             | table    | guacamole_user
+ public | guacamole_user                                          | table    | guacamole_user
+ public | guacamole_user_attribute                                | table    | guacamole_user
+ public | guacamole_user_group                                    | table    | guacamole_user
+ public | guacamole_user_group_attribute                          | table    | guacamole_user
+ public | guacamole_user_group_member                             | table    | guacamole_user
+ public | guacamole_user_group_permission                         | table    | guacamole_user
+ public | guacamole_user_group_user_group_id_seq                  | sequence | guacamole_user
+ public | guacamole_user_history                                  | table    | guacamole_user
+ public | guacamole_user_history_history_id_seq                   | sequence | guacamole_user
+ public | guacamole_user_password_history                         | table    | guacamole_user
+ public | guacamole_user_password_history_password_history_id_seq | sequence | guacamole_user
+ public | guacamole_user_permission                               | table    | guacamole_user
+ public | guacamole_user_user_id_seq                              | sequence | guacamole_user
+
+
+
+guacamole_connection_parameter - contains connection details
+guacamole_db=# select * from guacamole_connection_parameter;
+ connection_id | parameter_name | parameter_value 
+---------------+----------------+-----------------
+             1 | hostname       | 192.168.100.242
+             1 | port           | 3389
+             2 | hostname       | 192.168.100.242
+             2 | port           | 22
+
+guacamole_db=# select * from guacamole_entity;
+ entity_id |   name    | type 
+-----------+-----------+------
+         1 | guacadmin | USER
+         2 | tux       | USER
+(2 rows)
+
+guacamole_db=# select * from guacamole_user;
+ user_id | entity_id |                           password_hash                            |                           password_salt                            |         password_date         | disabled | expired | access_window_start | access_window_end | valid_from | valid_until | timezone | full_name | email_address | organization | organizational_role 
+---------+-----------+--------------------------------------------------------------------+--------------------------------------------------------------------+-------------------------------+----------+---------+---------------------+-------------------+------------+-------------+----------+-----------+---------------+--------------+---------------------
+       1 |         1 | \xca458a7d494e3be824f5e1e175a1556c0f8eef2c2d7df3633bec4a29c4411960 | \xfe24adc5e11e2b25288d1704abe67a79e342ecc26064ce69c5b3177795a82264 | 2025-04-10 07:33:01.119203-05 | f        | f       |                     |                   |            |             |          |           |               |              | 
+       2 |         2 | \xca458a7d494e3be824f5e1e175a1556c0f8eef2c2d7df3633bec4a29c4411960 | \xfe24adc5e11e2b25288d1704abe67a79e342ecc26064ce69c5b3177795a82264 | 2025-04-10 07:33:01.135215-05 | f        | f       |                     |                   |            |             |          |           |               |              | 
+(2 rows)
+
+this is what it looked like after I changed the password to linux for user tux
+guacamole_db=# select * from guacamole_user;
+ user_id | entity_id |                           password_hash                            |                           password_salt                            |         password_date         | disabled | expired | access_window_start | access_window_end | valid_from | valid_until | timezone | full_name | email_address | organization | organizational_role 
+---------+-----------+--------------------------------------------------------------------+--------------------------------------------------------------------+-------------------------------+----------+---------+---------------------+-------------------+------------+-------------+----------+-----------+---------------+--------------+---------------------
+       1 |         1 | \xca458a7d494e3be824f5e1e175a1556c0f8eef2c2d7df3633bec4a29c4411960 | \xfe24adc5e11e2b25288d1704abe67a79e342ecc26064ce69c5b3177795a82264 | 2025-04-10 07:33:01.119203-05 | f        | f       |                     |                   |            |             |          |           |               |              | 
+       2 |         2 | \x1980b3ead666faca2b67a71b9a9c1e0b1e169240bb57dac998741204b2855d1f | \xcf48ab767543984b0f142068eee930c0b19dc9905e6e9df620583008489a977b | 2025-04-10 07:54:05.997-05    | f        | f       |                     |                   |            |             |          |           |               |              | 
+(2 rows)
+
+no changes
+guacamole_db=# select * from guacamole_connection_permission;
+ entity_id | connection_id | permission 
+-----------+---------------+------------
+(0 rows)
+
+here i gave tux permission to use rdp and ssh
+
+guacamole_db=# select * from guacamole_connection_permission;
+ entity_id | connection_id | permission 
+-----------+---------------+------------
+         2 |             1 | READ
+         2 |             2 | READ
+(2 rows)
+QvgyQsFQyxcaE78iAV7ppJInA
