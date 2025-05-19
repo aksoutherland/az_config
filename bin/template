@@ -1,17 +1,17 @@
 #!/bin/bash
 # this script is used to update and/or create new templates for the class environments
-# before creating a new template please make sure you have added the appropriate variables vars file
-# we need to to make sure we have the latest version of the vars file in the correct location
-FILE=/home/$USER/az_config/vars
+# before creating a new template please make sure you have added the appropriate variables class.cfg file
+# we need to to make sure we have the latest version of the class.cfg file in the correct location
+FILE=/home/$USER/az_config/class.cfg
 if [ -f ${FILE} ];
 then
-        echo "vars exists"
+        echo "class.cfg exists"
 else
-        wget https://github.com/aksoutherland/az_config/raw/master/vars -O /home/$USER/az_config/vars
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
 # now we need to source the file so that we can use the variables to build our class environment
-source /home/$USER/az_config/vars
+source /home/$USER/az_config/class.cfg
 
 # we have 4 working directories set as environment variables
 # this is where we find the script to create the VM's
@@ -102,7 +102,7 @@ update_template () {
 }
 
 new_template () { 
-# NOTE: when using this function be sure to add the appropriate variables to the vars file for the new template you are creating
+# NOTE: when using this function be sure to add the appropriate variables to the class.cfg file for the new template you are creating
 # NOTE: otherwise this function will fail
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
