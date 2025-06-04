@@ -29,7 +29,7 @@ wget https://github.com/aksoutherland/az_config/raw/master/guac/initdb.sql -O /p
 # now we need to grab the file that contains the passwords used by guacamole for the different classes
 wget https://github.com/aksoutherland/az_config/raw/master/guac/vars -O /podman/postgresql/vars
 # here we insert the guacamole server's hostname in the the SQL init script
-sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
+sed -i "s/_HOSTNAME_/${IP}/g" /podman/postgresql/init/initdb.sql
 # now we set some variables for the passwords
 HASH=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f2)
 SALT=$(grep ${NAME} /podman/postgresql/vars | cut -d "|" -f3)
@@ -65,6 +65,7 @@ podman run -d --name guacamole \
 -e GUACD_PORT_4822_TCP_ADDR=guacd \
 -e GUACD_PORT_4822_TCP_PORT=4822 \
 -e GUACD_HOSTNAME=guacd \
+-e WEBAPP_CONTEXT=ROOT \
 -v /podman/guac/home:/etc/guacamole \
 --requires=guacd,postgresql \
 -p 8080:8080 \
