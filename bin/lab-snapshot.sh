@@ -20,7 +20,7 @@ CLASS="$1"
 ACTION="$2"
 SNAPNAME="$3"
 DESCRIPTION="$4"
-PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az-config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
 # here we define the usage
 usage () {
         echo
@@ -69,7 +69,7 @@ then
         export DESCRIPTION=pre-class
 fi
 
- we are going to set some variables to be used in the for loops below
+# we are going to set some variables to be used in the for loops below
 # here we get the resource group name
 export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
 
@@ -98,36 +98,36 @@ case $2 in
 list)
 # this is where we list the snapshots
 	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do echo $server 
-		&& sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/
-		&& sshpass -e ssh tux@${server} bash /home/tux/snapshot list
+	do echo $server && 
+		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot list
 	done
 	;;
 
 create)
 # this is where we create the snapshots
         for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do echo $server 
-		&& sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/
-		&& sshpass -p ${PASSWD} ssh tux@${server} bash /home/tux/snapshot create ${SNAPNAME} ${DESCRIPTION}
+	do echo $server && 
+		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
 delete)
 # this is where we delete the snapshots
 	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do echo $server 
-		&& sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/
-		&& sshpass -p ${PASSWD} ssh tux@${server} bash /home/tux/snapshot delete ${SNAPNAME} ${DESCRIPTION}
+	do echo $server && 
+		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
 revert)
 # this is where we revert the snapshots
 	for server in $(az vm list-ip-addresses -g ${R} --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do echo $server 
-		&& sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/
-		&& sshpass -p ${PASSWD} ssh tux@${server} bash /home/tux/snapshot revert ${SNAPNAME} ${DESCRIPTION}
+	do echo $server && 
+		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
