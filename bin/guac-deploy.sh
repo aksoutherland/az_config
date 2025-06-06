@@ -74,8 +74,10 @@ setup)
 		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/guac tux@${server}:/home/tux/bin/ && 
 		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/guac setup
         done
-	echo "Your lab password if ${PASSWD}"
-	echo "Your server IP's are ${IP}"
+	echo "Your lab password is:"
+        echo "${PASSWD}"
+	echo "Your server IP's are:"
+        echo "${IP}"
         ;;
 
 remove)
