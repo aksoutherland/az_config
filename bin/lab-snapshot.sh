@@ -99,8 +99,8 @@ list)
 # this is where we list the snapshots
 	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do echo $server && 
-		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot list
+		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot list
 	done
 	;;
 
@@ -108,8 +108,8 @@ create)
 # this is where we create the snapshots
         for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do echo $server && 
-		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
+		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
@@ -117,8 +117,8 @@ delete)
 # this is where we delete the snapshots
 	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do echo $server && 
-		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME} ${DESCRIPTION}
+		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
@@ -126,8 +126,8 @@ revert)
 # this is where we revert the snapshots
 	for server in $(az vm list-ip-addresses -g ${R} --output table | awk '{print $2}' | egrep -v 'Public|----');
 	do echo $server && 
-		sshpass -e scp /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
+		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
+		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
