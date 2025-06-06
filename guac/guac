@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will setup and/or Guacamole on the host
+# This script will setup and/or remove Guacamole on the host
 #
 usage () {
         echo
@@ -11,7 +11,8 @@ usage () {
 	echo
         echo "Please re-run the command with the proper argument"
         echo
-        echo "EXAMPLE COMMAND: guac setup / guac remove"
+        echo "EXAMPLE COMMAND: guac setup"
+        echo " 		       guac remove"
         echo
 }
 
@@ -113,6 +114,7 @@ setup)
 	echo
 	;;
 
+
 remove)
 	echo "Removing Guacamole"
 	# first we stop all containers
@@ -130,6 +132,57 @@ remove)
 	# finally we remove the folders that podman was using
 	sudo rm -rf /podman
 	echo "Guacamole has been removed"
+	;;
+
+minimal)
+	# here we are adding the ip/hostname to /etc/hosts
+	# first we gather the details
+	IP=$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+	NAME=$(hostname)
+	# Now we create the required folders
+	sudo mkdir -m 775 -p /podman/guac/home/.guacamole
+	sudo mkdir -m 775 -p /podman/postgresql/{data,init}
+	sudo mkdir -m 775 -p /podman/guacd/{drive,records}
+	sudo mkdir -m 775 -p /podman/caddy/{config,data}
+	# Set the ownership on the folders
+	sudo chown $UID:100 -R /podman
+	# Create the Guacamole Network
+	podman network create guacamole
+	# Initialize the database for Guacamole
+	# this command can be used to grab a custom initdb.sql that can be used to initialze the DB for first time use
+	wget https://github.com/aksoutherland/az_config/raw/master/initdb.sql -O /podman/postgresql/init/initdb.sql
+	sed -i "s/_HOSTNAME_/${NAME}/g" /podman/postgresql/init/initdb.sql
+	# Start the required containers starting with postgresql
+	podman run -d --name postgresql \
+	-v /podman/postgresql/init:/docker-entrypoint-initdb.d \
+	-v /podman/postgresql/data:/var/lib/postgresql/data \
+	-v /etc/localtime:/etc/localtime:ro \
+	-e POSTGRES_USER=guacamole_user \
+	-e POSTGRES_PASSWORD=some_password \
+	-e POSTGRES_DB=guacamole_db \
+	--network=guacamole \
+	docker.io/library/postgres:16-alpine
+	# followed by the Guacamole listener daemon
+	podman run -d --name guacd \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v /podman/guacd/records:/record \
+	-v /podman/guacd/drive:/drive \
+	--network=guacamole \
+	docker.io/guacamole/guacd
+	# now for the Guacamole container
+	podman run -d --name guacamole \
+	-e POSTGRESQL_HOSTNAME=postgresql \
+	-e POSTGRESQL_DATABASE=guacamole_db \
+	-e POSTGRESQL_USER=guacamole_user \
+	-e POSTGRESQL_PASSWORD=some_password \
+	-e GUACD_PORT_4822_TCP_ADDR=guacd \
+	-e GUACD_PORT_4822_TCP_PORT=4822 \
+	-e GUACD_HOSTNAME=guacd \
+	-v /podman/guac/home:/etc/guacamole \
+	--requires=guacd,postgresql \
+	-p 8080:8080 \
+	--network=guacamole \
+	docker.io/guacamole/guacamole
 	;;
 
 *)
