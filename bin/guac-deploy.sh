@@ -4,6 +4,15 @@ ACTION=$1
 # this is the course that we are working with
 COURSE=$2
 
+FILE1=/home/$USER/az_config/class.cfg
+if [ -f ${FILE1} ];
+then
+        echo "class.cfg exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
+fi
+
+
 usage () {
 	echo
 	echo "USAGE: $0 <action> <course>"
@@ -56,9 +65,12 @@ export SSHPASS=${PASSWD}
 # here we are going to get a list of the IP's of the remote machines
 export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
+# here we are going to get a list of the IP's of the remote machines
+export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
+
 # now we need to do is make sure we have latest version of the guac script to send to the remote machine
-FILE=/home/$USER/bin/guac
-if [ -f ${FILE} ];
+FILE2=/home/$USER/bin/guac
+if [ -f ${FILE2} ];
 then
         echo "guac script exists"
 else
@@ -77,7 +89,7 @@ setup)
 	echo "Your lab password is:"
         echo "${PASSWD}"
 	echo "Your server IP's are:"
-        echo "${IP}"
+        echo "${NAME}"
         ;;
 
 remove)
