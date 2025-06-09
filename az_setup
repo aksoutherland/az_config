@@ -22,5 +22,11 @@ cd ~/az_config
 # now we are going to put the scripts into the correct folder and make them executable
 mv bin/* ~/bin
 sudo chmod +x ~/bin/*
+# some of ron's original files have been changed, here we copy the changed files over the original files
+cp modified/copy-image-to-new-azure-container.sh /home/$USER/lab_setup/azure-course-tools/copy-image-to-new-azure-container.sh
+cp modified/create-azure-vm.sh /home/$USER/lab_setup/create-azure-vm/create-azure-vm.sh
+cp modified/create-course-env-in-azure.sh /home/$USER/lab_setup/azure-course-tools/create-course-env-in-azure.sh
+cp modified/get-azure-storage-key.sh /home/$USER/lab_setup/azure-course-tools/get-azure-storage-key.sh
+cp modified/show-image-copy-status.sh /home/$USER/lab_setup/azure-course-tools/show-image-copy-status.sh
 # you now have everything needed to be able to deploy classes in azure
 # for these script to work, you will need to authenticate to azure using "az login"
