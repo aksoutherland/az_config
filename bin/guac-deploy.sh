@@ -3,7 +3,7 @@
 ACTION=$1
 # this is the course that we are working with
 COURSE=$2
-
+# we need to make sure that we have the newest version of class.cfg so that we have the proper password
 FILE1=/home/$USER/az_config/class.cfg
 if [ -f ${FILE1} ];
 then
@@ -11,7 +11,6 @@ then
 else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
-
 
 usage () {
 	echo
@@ -59,13 +58,13 @@ export RG="$(az group list -o table | grep ${COURSE} | cut -d " " -f1)"
 # here we get the lab station password
 export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
 
-# now we set the password
+# now we set the password for the sshpass command
 export SSHPASS=${PASSWD}
 
 # here we are going to get a list of the IP's of the remote machines
 export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
-# here we are going to get a list of the IP's of the remote machines
+# here we are going to get a list of HOSTNAME's and IP's of the remote machines
 export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
 
 # now we need to do is make sure we have latest version of the guac script to send to the remote machine
