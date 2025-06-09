@@ -1,0 +1,34 @@
+#!/bin/bash
+# this script will call the other scripts needed to complete the class deployment
+# and must be run once the class script has completed and all of your
+# vm's are up and running
+CLASS="$1"
+HOMEBIN=/home/$USER/bin/
+usage () {
+        echo
+        echo "USAGE: $0 <class>"
+        echo
+        echo "When running this script, we specify 1 argument to declare the class"
+	echo 
+	echo "The first argument will specify the lab environment and the second argument will specify the snapshot action"
+        echo
+        echo "Please re-run the command using the proper argument"
+        echo
+        echo "EXAMPLE COMMAND: "
+	echo "			class-prep sle201"
+        echo
+	exit
+}
+
+case $1 in
+$CLASS)
+	bash ${HOMEBIN}guac-deploy.sh setup ${CLASS}
+	bash ${HOMEBIN}lab-snapshot.sh ${CLASS} create 
+	bash ${HOMEBIN}lab-ssh.sh ${CLASS} add
+	;;
+*)
+	echo
+	usage
+	exit
+	;;
+esac
