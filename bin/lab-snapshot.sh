@@ -21,6 +21,7 @@ ACTION="$2"
 SNAPNAME="$3"
 DESCRIPTION="$4"
 PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+REGION="centralus"
 # here we define the usage
 usage () {
         echo
@@ -70,8 +71,9 @@ then
 fi
 
 # we are going to set some variables to be used in the for loops below
+#
 # here we get the resource group name
-export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
+export RG="$(az group list -o table | grep ${CLASS}-${REGION} | cut -d " " -f1)"
 
 # here we get the lab station password
 export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
@@ -82,7 +84,12 @@ export SSHPASS=${PASSWD}
 # here we are going to get a list of the IP's of the remote machines
 export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
-# now we need to do is make sure we have latest version of the guac script to send to the remote machine
+# here we are setting the options for ssh and scp commands
+export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
+SNAPSHOT=/home/$USER/bin/snapshot
+
+# now we need to make sure we have latest version of the snapshot script to send to the remote machine
 FILE=/home/$USER/bin/snapshot
 if [ -f ${FILE} ];
 then
@@ -91,43 +98,40 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/bin/snapshot -O /home/$USER/bin/snapshot
 fi
 
-# this is the command we use to get the password from the class script - you may have to change the path to the class script
-# grep VM_PASSWD_${CLASS} /home/$USER/bin/class | cut -d "=" -f 2 | tr -d \'\"
-#
 case $2 in
 list)
 # this is where we list the snapshots
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do echo $server && 
-		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot list
+		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SSH} tux@${server} bash /home/tux/bin/snapshot list
 	done
 	;;
 
 create)
 # this is where we create the snapshots
-        for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+        for server in ${IP};
 	do echo $server && 
-		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
+		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SSH} tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
 delete)
 # this is where we delete the snapshots
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do echo $server && 
-		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME} ${DESCRIPTION}
+		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SSH} tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME}
         done
         ;;
 
 revert)
 # this is where we revert the snapshots
-	for server in $(az vm list-ip-addresses -g ${R} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do echo $server && 
-		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/snapshot tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
+		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SSH} tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
 
