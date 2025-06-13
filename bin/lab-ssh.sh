@@ -50,37 +50,42 @@ then
 	exit
 fi
 
+# now we need to make sure we have the latest version of the class.cfg file
+FILE=/home/$USER/az_config/class.cfg
+if [ -f ${FILE} ];
+then
+        echo "class.cfg exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
+fi
+
+# now we need to source the file so that contains the variables needed for the commands below
+source ${FILE}
+
 # we are going to set some variables to be used in the for loops below
 # here we get the resource group name
-export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
+export RG=$(az group list -o table | grep ${CLASS} | cut -d " " -f1)
 
 # here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+export PASSWD=$(grep VM_PASSWD_${CLASS} ${FILE} | cut -d "=" -f 2 | tr -d \'\")
 
 # now we set the password
 export SSHPASS=${PASSWD}
 
-# here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
-
+# here we are going to get a list of the IP's and names of the remote machines
+export IP=$(az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $2}')
+export NAME=$(az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $1}')
 
 case $2 in
 add)
 	# the first step is to back up your /etc/hosts and ~/.ssh/known_hosts file
 	sudo cp /etc/hosts /etc/hosts-pre_class
 	cp /home/$USER/.ssh/known_hosts /home/$USER/.ssh/known_hosts-pre_class
-	# now we need to get a list of stations from azure and append them to your existing /etc/hosts file
-	az vm list-ip-addresses -g ${RG} --output table | awk '{print $2,$1}' | egrep -v 'Public|----' | sudo tee -a /etc/hosts
 	# now we need to send your ssh keys to the lab vm's
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
-	do
-	sshpass -p ${PASSWD} ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@${server};
-	ssh-keyscan -H $server >> /home/$USER/.ssh/known_hosts
-	done
-	# this next loop allows you to connect to the hostname without having to accept the fingerprint
-	for hostname in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1}' | egrep -v 'Public|----');
-	do
-	ssh-keyscan -H $hostname >> /home/$USER/.ssh/known_hosts
+	az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $2,$1}' | sudo tee -a /etc/hosts
+	for server in ${IP};
+	do sshpass -e ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@$server &&
+		ssh-keyscan -H $server >> /home/$USER/.ssh/known_hosts;
 	done
 	echo
 	echo "Your hosts and known_hosts files have been updated"
