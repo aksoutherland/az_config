@@ -1,6 +1,7 @@
 #!/bin/bash
 # this script will connect you to the  lab vm's
 # this is the course that we are working with
+COURSE=$1
 
 ### Colors ###
 RED='\e[0;31m'
@@ -21,8 +22,6 @@ WHITE='\e[1;37m'
 NC='\e[0m'
 ##############
 
-
-COURSE=$1
 # we need to make sure that we have the newest version of class.cfg so that we have the proper password
 FILE1=/home/$USER/az_config/class.cfg
 if [ -f ${FILE1} ];
@@ -31,6 +30,8 @@ then
 else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
+
+source ${FILE1}
 
 usage () {
 	echo
@@ -57,19 +58,6 @@ then
 	exit
 fi
 
-# we are going to set some variables to be used in the for loops below
-# here we get the resource group name
-export RG="$(az group list -o table | grep ${COURSE} | cut -d " " -f1)"
-
-# here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
-
-# here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
-
-# here we are going to get a list of HOSTNAME's and IP's of the remote machines
-export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
-
 # here we show you the password and the stations you will connect to
 echo "Your lab password is:"
 echo -e "${GREEN}${PASSWD}${NC}"
@@ -77,4 +65,4 @@ echo "Your server IP's are:"
 echo -e "${GREEN}${NAME}${NC}"
 
 # this command will gather the IP's from your lab environment and open a new tab in firefox for each station
-for line in ${IP}; do firefox --new-tab --url "$line:8080" & sleep 1 ; done
+echo "for line in ${IP}; do firefox --new-tab --url "$line:8080" & sleep 1 ; done"
