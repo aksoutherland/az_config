@@ -82,7 +82,7 @@ update_template () {
 		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
  	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
 	# here we set the password for the newly created vm
-        az vm user update -g ${RG} --name $COURSE-template --username tux --password 'linux'
+        az vm user update -g ${TMPLRG} --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
         echo
@@ -104,7 +104,7 @@ new_template () {
 		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE="${!sub1}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
         bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/$COURSE-vm-template.azvm
 	# here we set the password for the newly created vm
-        az vm user update -g ${RG} --name $COURSE-template --username tux --password 'linux'
+        az vm user update -g ${TMPLRG} --name $COURSE-template --username tux --password 'linux'
         echo
         echo "Your template has been created"
         echo
@@ -112,9 +112,9 @@ new_template () {
 
 publish_template () {
 	# our first step will be to stop the VM
-	az vm deallocate -g ${RG} -n ${COURSE}-template
+	az vm deallocate -g ${TMPLRG} -n ${COURSE}-template
 	# now we need to delete the VM
-	az vm delete -g ${RG} -n ${COURSE}-template -y
+	az vm delete -g ${TMPLRG} -n ${COURSE}-template -y
 	# now we can move the vhd to the correct container
 	az storage blob copy start \
 	--account-name ${ACCOUNT} \
@@ -132,8 +132,8 @@ publish_template () {
 	--container-name course-disks \
 	--name ${COURSE}-template-disk.vhd
 	# now we need to remove the rest of the VM files
-        az network nic delete -g ${RG} --name ${COURSE}-templateVMNic
-        az network public-ip delete -g ${RG} --name ${COURSE}-templatePublicIP
+        az network nic delete -g ${TMPLRG} --name ${COURSE}-templateVMNic
+        az network public-ip delete -g ${TMPLRG} --name ${COURSE}-templatePublicIP
         az network nsg delete -g ${RG} --name ${COURSE}-templateNSG
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
         echo
@@ -143,9 +143,9 @@ publish_template () {
 
 delete_template () {
 	# our first step will be to stop the VM
-        az vm deallocate -g ${RG} -n ${COURSE}-template
+        az vm deallocate -g ${TMPLRG} -n ${COURSE}-template
         # now we need to delete the VM
-        az vm delete -g ${RG} -n ${COURSE}-template -y
+        az vm delete -g ${TMPLRG} -n ${COURSE}-template -y
         # now we delete the vhd for the VM
         az storage blob delete \
         --account-name ${ACCOUNT} \
@@ -153,9 +153,9 @@ delete_template () {
         --container-name course-disks \
         --name ${COURSE}-template-disk.vhd
         # now we need to remove the rest of the VM files
-        az network nic delete -g ${RG} --name ${COURSE}-templateVMNic
-        az network public-ip delete -g ${RG} --name ${COURSE}-templatePublicIP
-        az network nsg delete -g ${RG} --name ${COURSE}-templateNSG
+        az network nic delete -g ${TMPLRG} --name ${COURSE}-templateVMNic
+        az network public-ip delete -g ${TMPLRG} --name ${COURSE}-templatePublicIP
+        az network nsg delete -g ${TMPLRG} --name ${COURSE}-templateNSG
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
 	echo 
 	echo "Your template has been removed"
