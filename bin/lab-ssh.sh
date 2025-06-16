@@ -62,20 +62,6 @@ fi
 # now we need to source the file so that contains the variables needed for the commands below
 source ${FILE}
 
-# we are going to set some variables to be used in the for loops below
-# here we get the resource group name
-#export RG=$(az group list -o table | grep ${CLASS} | cut -d " " -f1)
-
-# here we get the lab station password
-#export PASSWD=$(grep VM_PASSWD_${CLASS} ${FILE} | cut -d "=" -f 2 | tr -d \'\")
-
-# now we set the password
-#export SSHPASS=${PASSWD}
-
-# here we are going to get a list of the IP's and names of the remote machines
-#export IP=$(az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $2}')
-#export NAME=$(az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $1}')
-
 case $2 in
 add)
 	# the first step is to back up your /etc/hosts and ~/.ssh/known_hosts file

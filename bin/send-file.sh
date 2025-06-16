@@ -9,6 +9,18 @@
 COURSE="$1"
 FILE="$2"
 
+# now we need to make sure we have the latest version of the class.cfg file
+FILE1=/home/$USER/az_config/class.cfg
+if [ -f ${FILE1} ];
+then
+        echo "class.cfg exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
+fi
+
+# now we need to source the file so that contains the variables needed for the commands below
+source ${FILE1}
+
 usage () {
         echo
         echo "USAGE: $0 <course> <filename>"
@@ -35,18 +47,6 @@ then
 	usage
 	exit
 fi
-
-# here we get the resource group name
-#export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
-
-# here we get the lab station password
-#export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
-
-# now we set the password
-#export SSHPASS=${PASSWD}
-
-# here we are going to get a list of the IP's of the remote machines
-#export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
 case $2 in
 ${FILE})
