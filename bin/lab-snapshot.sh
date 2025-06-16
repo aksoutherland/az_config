@@ -16,16 +16,34 @@
 # $DESCRIPTION will be used to define the description of the snapshot if needed
 # $4 will be used to define the snapshot description
 #
-CLASS="$1"
+COURSE="$1"
 ACTION="$2"
 SNAPNAME="$3"
 DESCRIPTION="$4"
-PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
-REGION="centralus"
+FILE1=/home/$USER/az_config/class.cfg
+if [ -f ${FILE1} ];
+then
+        echo "class.cfg exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
+fi
+
+source ${FILE1}
+
+# now we need to make sure we have latest version of the snapshot script to send to the remote machine
+FILE=/home/$USER/bin/snapshot
+if [ -f ${FILE} ];
+then
+        echo "snapshot script exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/bin/snapshot -O /home/$USER/bin/snapshot
+fi
+
+
 # here we define the usage
 usage () {
         echo
-        echo "USAGE: $0 <class> <action>"
+        echo "USAGE: $0 <course> <action>"
         echo
         echo "When running this script, we specify 2 arguments to declare the class and the snapshot action"
 	echo 
@@ -73,37 +91,28 @@ fi
 # we are going to set some variables to be used in the for loops below
 #
 # here we get the resource group name
-export RG="$(az group list -o table | grep ${CLASS}-${REGION} | cut -d " " -f1)"
+#export RG="$(az group list -o table | grep ${CLASS}-${REGION} | cut -d " " -f1)"
 
 # here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+#export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
 
 # now we set the password
-export SSHPASS=${PASSWD}
+#export SSHPASS=${PASSWD}
 
 # here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+#export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
 # here we are setting the options for ssh and scp commands
-export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
-export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
-SNAPSHOT=/home/$USER/bin/snapshot
+#export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+#export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
-# now we need to make sure we have latest version of the snapshot script to send to the remote machine
-FILE=/home/$USER/bin/snapshot
-if [ -f ${FILE} ];
-then
-        echo "snapshot script exists"
-else
-        wget https://github.com/aksoutherland/az_config/raw/master/bin/snapshot -O /home/$USER/bin/snapshot
-fi
 
 case $2 in
 list)
 # this is where we list the snapshots
 	for server in ${IP};
 	do echo $server && 
-		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SCP} ${FILE} tux@${server}:/home/tux/bin/ && 
 		${SSH} tux@${server} bash /home/tux/bin/snapshot list
 	done
 	;;
@@ -112,7 +121,7 @@ create)
 # this is where we create the snapshots
         for server in ${IP};
 	do echo $server && 
-		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SCP} ${FILE} tux@${server}:/home/tux/bin/ && 
 		${SSH} tux@${server} bash /home/tux/bin/snapshot create ${SNAPNAME} ${DESCRIPTION}
         done
         ;;
@@ -121,7 +130,7 @@ delete)
 # this is where we delete the snapshots
 	for server in ${IP};
 	do echo $server && 
-		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SCP} ${FILE} tux@${server}:/home/tux/bin/ && 
 		${SSH} tux@${server} bash /home/tux/bin/snapshot delete ${SNAPNAME}
         done
         ;;
@@ -130,7 +139,7 @@ revert)
 # this is where we revert the snapshots
 	for server in ${IP};
 	do echo $server && 
-		${SCP} ${SNAPSHOT} tux@${server}:/home/tux/bin/ && 
+		${SCP} ${FILE} tux@${server}:/home/tux/bin/ && 
 		${SSH} tux@${server} bash /home/tux/bin/snapshot revert ${SNAPNAME} ${DESCRIPTION}
         done
         ;;

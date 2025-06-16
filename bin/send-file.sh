@@ -6,12 +6,12 @@
 # then use scp with the password and the ip to send the files to the azure vm host :/home/tux/
 # !!!for this script to work you will need to install the sshpass package using the command "sudo zypper in sshpass"!!!
 #
-CLASS="$1"
+COURSE="$1"
 FILE="$2"
 
 usage () {
         echo
-        echo "USAGE: $0 <class> <filename>"
+        echo "USAGE: $0 <course> <filename>"
         echo
         echo "When running this script, we specify 2 arguments to declare the lab environment and the filename to send"
         echo
@@ -37,24 +37,24 @@ then
 fi
 
 # here we get the resource group name
-export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
+#export RG="$(az group list -o table | grep ${CLASS} | cut -d " " -f1)"
 
 # here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+#export PASSWD=$(grep VM_PASSWD_${CLASS} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
 
 # now we set the password
-export SSHPASS=${PASSWD}
+#export SSHPASS=${PASSWD}
 
 # here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+#export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
 case $2 in
 ${FILE})
 	for FILE in "${@:2}"
 	do echo ${FILE}
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do
-	sshpass -e scp -o StrictHostKeyChecking=no ${FILE} tux@${server}:/home/tux/
+	${SCP} ${FILE} tux@${server}:/home/tux/
 	done
 	done
 	echo 
