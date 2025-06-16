@@ -67,6 +67,11 @@ export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' |
 # here we are going to get a list of HOSTNAME's and IP's of the remote machines
 export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
 
+# set ssh command
+export SSH="sshpass -e scp -o StrictHostKeyChecking=no"
+# set scp command
+export SCP="sshpass -e ssh -o StrictHostKeyChecking=no"
+
 # now we need to do is make sure we have latest version of the guac script to send to the remote machine
 FILE2=/home/$USER/bin/guac
 if [ -f ${FILE2} ];
@@ -80,22 +85,26 @@ fi
 case $1 in
 setup)
 # this is where we deploy guacamole
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do echo $server &&
-		sshpass -e scp -o StrictHostKeyChecking=no /home/$USER/bin/guac tux@${server}:/home/tux/bin/ && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/guac setup
+		${SSH} /home/$USER/bin/guac tux@${server}:/home/tux/bin/ && 
+		${SCP} tux@${server} bash /home/tux/bin/guac setup
         done
 	echo "Your lab password is:"
         echo "${PASSWD}"
 	echo "Your server IP's are:"
         echo "${NAME}"
+	echo
+	echo "You can connect to the lab environment VM's"
+	echo "using this command"
+	echo "for line in ${IP}; do firefox --new-tab --url "$line:8080" & sleep 1 ; done"
         ;;
 
 remove)
 # this is where we remove guacamole
-	for server in $(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----');
+	for server in ${IP};
 	do echo $server && 
-		sshpass -e ssh -o StrictHostKeyChecking=no tux@${server} bash /home/tux/bin/guac remove
+		${SSH} tux@${server} bash /home/tux/bin/guac remove
         done
         ;;
 
