@@ -20,11 +20,6 @@ COURSE=$2
 # this is the number of stations that we will be deploying
 SEAT=$3
 
-# Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
-sub1=VM_DISK_SIZE_${COURSE}	
-sub2=VM_PASSWD_${COURSE}	
-sub3=VM_SIZE_${COURSE}	
-
 usage () {
 	echo
 	echo "USAGE: $0 <action> <course> <seat count>"
@@ -77,29 +72,29 @@ fi
 
 create_course () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
-		cp ${VM_TMPL_DIR}/course-environment.cfg.template ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/REGION=.*/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=.*/COURSE_RESOURCE_GROUP_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=.*/COURSE_STORAGE_ACCOUNT_BASE_NAME=${COURSE}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=.*/COURSE_STORAGE_CONTAINER_NAME=course-disks/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=.*/IMAGE_SOURCE_RESOURCE_GROUP=${RG}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=.*/IMAGE_SOURCE_STORAGE_ACCOUNT=${ACCOUNT}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=.*/IMAGE_SOURCE_CONTAINER_NAME=vhds/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=.*/IMAGE_SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
-	bash ${ENV_DIR}/create-course-env-in-azure.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+		cp ${COURSE_TMPL_SOURCE} ${COURSE_TEMPLATE}
+		sed -i "s/REGION=.*/REGION=${REGION}/g" ${COURSE_TEMPLATE}
+		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=.*/COURSE_RESOURCE_GROUP_BASE_NAME=${COURSE}/g" ${COURSE_TEMPLATE}
+		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=.*/COURSE_STORAGE_ACCOUNT_BASE_NAME=${COURSE}/g" ${COURSE_TEMPLATE}
+		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=.*/COURSE_STORAGE_CONTAINER_NAME=course-disks/g" ${COURSE_TEMPLATE}
+		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=.*/IMAGE_SOURCE_RESOURCE_GROUP=${RG}/g" ${COURSE_TEMPLATE}
+		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=.*/IMAGE_SOURCE_STORAGE_ACCOUNT=${ACCOUNT}/g" ${COURSE_TEMPLATE}
+		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=.*/IMAGE_SOURCE_CONTAINER_NAME=vhds/g" ${COURSE_TEMPLATE}
+		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=.*/IMAGE_SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${COURSE_TEMPLATE}
+	bash ${ENV_DIR}/create-course-env-in-azure.sh ${COURSE_TEMPLATE}
 	for VM in $( seq 1 ${SEAT})
 	do
-		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/REGION=.*/REGION=${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP=${COURSE}-${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-                sed -i "s/STORAGE_CONTAINER_NAME=.*/STORAGE_CONTAINER_NAME="vhds"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-                sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=.*/SOURCE_STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	   	sed -i "s/SOURCE_IMAGE_FILE=.*/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
- 	        sed -i "s/VM_NAME=.*/VM_NAME=${COURSE}-student${VM}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	        sed -i "s/VM_SIZE=.*/VM_SIZE=${!sub3}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
-	bash ${VM_DIR}/create-azure-vm.sh ${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+		cp ${VM_TMPL_SOURCE} ${VM_TEMPLATE2}
+		sed -i "s/REGION=.*/REGION=${REGION}/g" ${VM_TEMPLATE2}
+		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP=${COURSE}-${REGION}/g" ${VM_TEMPLATE2}
+		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT=${COURSE}${REGION}/g" ${VM_TEMPLATE2}
+                sed -i "s/STORAGE_CONTAINER_NAME=.*/STORAGE_CONTAINER_NAME="vhds"/g" ${VM_TEMPLATE2}
+                sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=.*/SOURCE_STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TEMPLATE2}
+	   	sed -i "s/SOURCE_IMAGE_FILE=.*/SOURCE_IMAGE_FILE=${COURSE}-template-disk.vhd/g" ${VM_TEMPLATE2}
+ 	        sed -i "s/VM_NAME=.*/VM_NAME=${COURSE}-student${VM}/g" ${VM_TEMPLATE2}
+	        sed -i "s/VM_SIZE=.*/VM_SIZE=${!sub3}/g" ${VM_TEMPLATE2}
+		sed -i "s/VM_DISK_SIZE=.*/VM_DISK_SIZE=${!sub1}/g" ${VM_TEMPLATE2}
+	bash ${VM_DIR}/create-azure-vm.sh ${VM_TEMPLATE2}
 	done
         # there have been issues reported setting the VM password using the template so we use this instead to set the passwords
 	for server in ${VMNAME}
@@ -115,7 +110,7 @@ create_course () {
 }
 
 delete_course () {
-	az group delete -n ${COURSE}-${REGION}
+	az group delete -n ${RG}
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
 	echo
 	echo "Your course has been removed"
