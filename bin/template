@@ -11,26 +11,13 @@ else
 fi
 
 # now we need to source the file so that we can use the variables to build our class environment
-source /home/$USER/az_config/class.cfg
-
-# we have 4 working directories set as environment variables
-# this is where we find the script to create the VM's
-VM_DIR=/home/$USER/lab_setup/create-azure-vm
-# this is the VM template dir
-VM_TMPL_DIR=/home/$USER/az_config
+source ${FILE}
 
 # here we are setting our variables for our course deployment
 # action - what are we doing
 ACTION=$1
 # this is the course that we are working with
 COURSE=$2
-
-# here we get the resource group name
-export RG="$(az group list -o table | sed -n '3 p' | cut -d " " -f1)"
-# here we get the storage account name
-export ACCOUNT="$(az storage account list -o table | sed -n '4 p' | awk '{ print $9 }')"
-# here we get the storage key
-export KEY="$(az storage account keys list --account-name ${ACCOUNT} --output table 2> /dev/null | grep "key1" | awk '{ print $4 }')"
 
 # Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
 # this will change the correct entries in the vm template file using the variables listed above
