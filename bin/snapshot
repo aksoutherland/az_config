@@ -35,28 +35,30 @@ then
         SNAPNAME=snap01
 fi
 
+# here we set a variable for the command we use in each loop
+export LIST="virsh list --all | awk '{print $2}'| grep -v Name"
 
 case $1 in
 create)
 # here we create and list the snapshots
 	echo 
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-create-as --domain $NAME --name "$SNAPNAME" --description "$DESCRIPTION"; done
+	for NAME in ${LIST} ; do virsh snapshot-create-as --domain $NAME --name "$SNAPNAME" --description "$DESCRIPTION"; done
 	;;
 delete)
 # here we delete and list the snapshots
 	echo
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-delete --domain $NAME "$SNAPNAME" ; done
+	for NAME in ${LIST} ; do virsh snapshot-delete --domain $NAME "$SNAPNAME" ; done
 	;;
 list)
 # here we list the snapshots
 
         echo
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-list $NAME ; done
+	for NAME in ${LIST} ; do virsh snapshot-list $NAME ; done
 	;;
 revert)
 # here we revert and list the snapshots
         echo
-	for NAME in $(virsh list --all | awk '{print $2}'| grep -v Name) ; do virsh snapshot-revert --domain $NAME "$SNAPNAME" ; done
+	for NAME in ${LIST} ; do virsh snapshot-revert --domain $NAME "$SNAPNAME" ; done
 	;;
 *)
         echo
