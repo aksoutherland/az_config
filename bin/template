@@ -72,7 +72,7 @@ update_template () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/REGION=.*/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
-		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP="${RG}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP="${TMPLRG}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT="${ACCOUNT}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
                 sed -i "s/STORAGE_CONTAINER_NAME=.*/STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
                 sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=.*/SOURCE_STORAGE_CONTAINER_NAME="vhds"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
@@ -94,7 +94,7 @@ new_template () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
 		cp ${VM_TMPL_DIR}/template.azvm ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/REGION=.*/REGION="${REGION}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
-		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP="${RG}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+		sed -i "s/RESOURCE_GROUP=.*/RESOURCE_GROUP="${TMPLRG}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/STORAGE_ACCOUNT=.*/STORAGE_ACCOUNT="${ACCOUNT}"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/STORAGE_CONTAINER_NAME=.*/STORAGE_CONTAINER_NAME="course-disks"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
 		sed -i "s/SOURCE_STORAGE_CONTAINER_NAME=.*/SOURCE_STORAGE_CONTAINER_NAME="labmachine-images"/g" ${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
@@ -134,7 +134,7 @@ publish_template () {
 	# now we need to remove the rest of the VM files
         az network nic delete -g ${TMPLRG} --name ${COURSE}-templateVMNic
         az network public-ip delete -g ${TMPLRG} --name ${COURSE}-templatePublicIP
-        az network nsg delete -g ${RG} --name ${COURSE}-templateNSG
+        az network nsg delete -g ${TMPLRG} --name ${COURSE}-templateNSG
 	rm -r ${VM_TMPL_DIR}/${COURSE} 2>/dev/null
         echo
         echo "Your template has been published "
