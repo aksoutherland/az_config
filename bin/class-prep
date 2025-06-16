@@ -22,9 +22,10 @@ usage () {
 
 case $1 in
 $CLASS)
-	bash ${HOMEBIN}guac-deploy.sh setup ${CLASS}
-	bash ${HOMEBIN}lab-snapshot.sh ${CLASS} create 
 	bash ${HOMEBIN}lab-ssh.sh ${CLASS} add
+	bash ${HOMEBIN}lab-snapshot.sh ${CLASS} create 
+	bash ${HOMEBIN}guac-deploy.sh setup ${CLASS}
+	bash ${HOMEBIN}class-connect.sh ${CLASS}
 	;;
 *)
 	echo
