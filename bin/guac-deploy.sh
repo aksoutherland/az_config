@@ -12,6 +12,18 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
+source ${FILE1}
+
+# now we need to do is make sure we have latest version of the guac script to send to the remote machine
+FILE2=/home/$USER/bin/guac
+if [ -f ${FILE2} ];
+then
+        echo "guac script exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/guac/guac -O /home/$USER/bin/guac
+fi
+
+
 usage () {
 	echo
 	echo "USAGE: $0 <action> <course>"
@@ -49,36 +61,6 @@ then
 	echo 
 	usage
 	exit
-fi
-
-# we are going to set some variables to be used in the for loops below
-# here we get the resource group name
-export RG="$(az group list -o table | grep ${COURSE} | cut -d " " -f1)"
-
-# here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
-
-# now we set the password for the sshpass command
-export SSHPASS=${PASSWD}
-
-# here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
-
-# here we are going to get a list of HOSTNAME's and IP's of the remote machines
-export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
-
-# set ssh command
-export SSH="sshpass -e scp -o StrictHostKeyChecking=no"
-# set scp command
-export SCP="sshpass -e ssh -o StrictHostKeyChecking=no"
-
-# now we need to do is make sure we have latest version of the guac script to send to the remote machine
-FILE2=/home/$USER/bin/guac
-if [ -f ${FILE2} ];
-then
-        echo "guac script exists"
-else
-	wget https://github.com/aksoutherland/az_config/raw/master/guac/guac -O /home/$USER/bin/guac
 fi
 
 # here we will either setup or remove guacamole
