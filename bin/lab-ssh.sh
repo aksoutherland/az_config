@@ -82,7 +82,7 @@ add)
 	sudo cp /etc/hosts /etc/hosts-pre_class
 	cp /home/$USER/.ssh/known_hosts /home/$USER/.ssh/known_hosts-pre_class
 	# now we need to send your ssh keys to the lab vm's
-	az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk '{print $2,$1}' | sudo tee -a /etc/hosts
+	az vm list-ip-addresses -g ${RG} --output table | egrep -v 'Public|----' | awk -F '-' '{print $2,$1}' | awk '{print $2,$1}' | sudo tee -a /etc/hosts
 	for server in ${IP};
 	do sshpass -e ssh-copy-id -o StrictHostKeyChecking=accept-new -f tux@$server &&
 		ssh-keyscan -H $server >> /home/$USER/.ssh/known_hosts;
