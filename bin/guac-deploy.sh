@@ -3,6 +3,7 @@
 ACTION=$1
 # this is the course that we are working with
 COURSE=$2
+
 # we need to make sure that we have the newest version of class.cfg so that we have the proper password
 FILE1=/home/$USER/az_config/class.cfg
 if [ -f ${FILE1} ];
@@ -12,8 +13,6 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
-source ${FILE1}
-
 # now we need to do is make sure we have latest version of the guac script to send to the remote machine
 FILE2=/home/$USER/bin/guac
 if [ -f ${FILE2} ];
@@ -22,7 +21,6 @@ then
 else
         wget https://github.com/aksoutherland/az_config/raw/master/guac/guac -O /home/$USER/bin/guac
 fi
-
 
 usage () {
 	echo
@@ -62,6 +60,8 @@ then
 	usage
 	exit
 fi
+
+source ${FILE1}
 
 # here we will either setup or remove guacamole
 case $1 in

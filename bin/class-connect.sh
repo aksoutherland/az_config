@@ -31,8 +31,6 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
-source ${FILE1}
-
 usage () {
 	echo
 	echo "USAGE: $0 <course>"
@@ -57,6 +55,8 @@ then
 	usage
 	exit
 fi
+
+source ${FILE1}
 
 # here we show you the password and the stations you will connect to
 echo "Your lab password is:"

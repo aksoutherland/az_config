@@ -28,8 +28,6 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
-source ${FILE1}
-
 # now we need to make sure we have latest version of the snapshot script to send to the remote machine
 FILE=/home/$USER/bin/snapshot
 if [ -f ${FILE} ];
@@ -38,7 +36,6 @@ then
 else
         wget https://github.com/aksoutherland/az_config/raw/master/bin/snapshot -O /home/$USER/bin/snapshot
 fi
-
 
 # here we define the usage
 usage () {
@@ -87,6 +84,8 @@ if [ -z "$4" ]
 then
         export DESCRIPTION=pre-class
 fi
+
+source ${FILE1}
 
 case $2 in
 list)

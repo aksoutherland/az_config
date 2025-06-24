@@ -18,9 +18,6 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
-# now we need to source the file so that contains the variables needed for the commands below
-source ${FILE1}
-
 usage () {
         echo
         echo "USAGE: $0 <course> <filename>"
@@ -47,6 +44,9 @@ then
 	usage
 	exit
 fi
+
+# now we need to source the file so that contains the variables needed for the commands below
+source ${FILE1}
 
 case $2 in
 ${FILE})
