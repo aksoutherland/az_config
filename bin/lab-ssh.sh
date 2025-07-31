@@ -9,6 +9,15 @@
 # $1 will be used to define the class
 # $2 will be the action - add or remove
 
+FILE1=/home/$USER/az_config/class.cfg
+if [ -f ${FILE1} ];
+then
+        echo "class.cfg exists"
+else
+        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
+fi
+
+
 COURSE=$1
 
 usage () {

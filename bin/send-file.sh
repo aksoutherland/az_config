@@ -45,8 +45,24 @@ then
 	exit
 fi
 
-# now we need to source the file so that contains the variables needed for the commands below
-source ${FILE1}
+# here we set the region
+REGION="centralus"
+
+# here we get the resource group name
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we are going to get a list of the IP's of the remote machines
+IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we get the lab station password
+PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
+# now we set the password
+SSHPASS=${PASSWD}
+
+# here we are setting the options for ssh and scp commands used in various scripts
+SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
 case $2 in
 ${FILE})

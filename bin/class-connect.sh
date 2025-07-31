@@ -56,8 +56,6 @@ then
 	exit
 fi
 
-source ${FILE1}
-
 # here we set the region
 REGION="centralus"
 

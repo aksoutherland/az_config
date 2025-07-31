@@ -67,6 +67,14 @@ then
 
 fi
 
+# we have 3 working directories set as environment variables
+# this location is where we find the scripts to create the azure env
+ENV_DIR=/home/$USER/lab_setup/azure-course-tools
+# this is where we find the script to create the VM's
+VM_DIR=/home/$USER/lab_setup/create-azure-vm
+# this is the VM template dir
+VM_TMPL_DIR=/home/$USER/az_config
+
 # here we set the region
 REGION="centralus"
 
