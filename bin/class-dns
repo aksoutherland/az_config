@@ -1,0 +1,50 @@
+#!/bin/bash
+# this script will setup dns for each of the student vm's to make it easier to connect to quacamole
+# we start by setting some variables
+
+# Here we grab the course id specified as a variable
+COURSE=$1
+
+usage () {
+        echo
+        echo "USAGE: $0 <course>"
+        echo
+        echo "When running this script, we specify 1 argument to declare the class"
+        echo
+        echo "The first argument will specify the lab environment"
+        echo
+        echo "Please re-run the command using the proper argument"
+        echo
+        echo "EXAMPLE COMMAND: "
+        echo "                  class-dns sle201"
+        echo
+        exit
+}
+
+if [ -z "$1" ]
+then
+        echo "You are missing the Course ID"
+        usage
+        exit
+fi
+
+# here we set the region
+REGION="centralus"
+
+# here we get the resource group name
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+case $1 in
+$COURSE)
+	az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----' > ~/tmp.out
+	sed -i 's/kub211-/create-dns --dns-name /g' ~/tmp.out
+	sed -i 's/ /.us.suse-labs.com --ip-address /3' ~/tmp.out
+	bash ~/tmp.out
+	rm ~/tmp.out
+	;;
+*)
+	echo
+	usage
+	exit
+	;;
+esac
