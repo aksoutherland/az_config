@@ -20,13 +20,6 @@ COURSE="$1"
 ACTION="$2"
 SNAPNAME="$3"
 DESCRIPTION="$4"
-FILE1=/home/$USER/az_config/class.cfg
-if [ -f ${FILE1} ];
-then
-        echo "class.cfg exists"
-else
-        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
-fi
 
 # now we need to make sure we have latest version of the snapshot script to send to the remote machine
 FILE=/home/$USER/bin/snapshot
@@ -85,7 +78,24 @@ then
         export DESCRIPTION=pre-class
 fi
 
-source ${FILE1}
+# here we set the region for the course
+REGION="centralus"
+
+# here we get the resource group name
+export RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we are going to get a list of the IP's of the remote machines
+export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we get the lab station password
+export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
+# now we set the password
+export SSHPASS=${PASSWD}
+
+# here we are setting the options for ssh and scp commands used in various scripts
+export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
 case $2 in
 list)

@@ -50,17 +50,20 @@ then
 	exit
 fi
 
-# now we need to make sure we have the latest version of the class.cfg file
-FILE=/home/$USER/az_config/class.cfg
-if [ -f ${FILE} ];
-then
-        echo "class.cfg exists"
-else
-        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
-fi
+# here we set the region
+REGION="centralus"
 
-# now we need to source the file so that contains the variables needed for the commands below
-source ${FILE}
+# here we get the resource group name
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we are going to get a list of the IP's of the remote machines
+IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we get the lab station password
+PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
+# now we set the password
+SSHPASS=${PASSWD}
 
 case $2 in
 add)

@@ -1,17 +1,9 @@
 #!/bin/bash
 # this script will deploy guacamole on the lab vm's
 ACTION=$1
+
 # this is the course that we are working with
 COURSE=$2
-
-# we need to make sure that we have the newest version of class.cfg so that we have the proper password
-FILE1=/home/$USER/az_config/class.cfg
-if [ -f ${FILE1} ];
-then
-        echo "class.cfg exists"
-else
-        wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
-fi
 
 # now we need to do is make sure we have latest version of the guac script to send to the remote machine
 FILE2=/home/$USER/bin/guac
@@ -61,7 +53,27 @@ then
 	exit
 fi
 
-source ${FILE1}
+# here we set the region
+REGION="centralus"
+
+# here we get the resource group name
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we are going to get a list of the IP's of the remote machines
+IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we are going to get a list of HOSTNAME's and IP's of the remote machines
+export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
+
+# here we get the lab station password
+PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
+# now we set the password
+export SSHPASS=${PASSWD}
+
+# here we are setting the options for ssh and scp commands used in various scripts
+export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
 # here we will either setup or remove guacamole
 case $1 in
@@ -69,17 +81,14 @@ setup)
 # this is where we deploy guacamole
 	for server in ${IP};
 	do echo $server &&
-		${SSH} /home/$USER/bin/guac tux@${server}:/home/tux/bin/ && 
-		${SCP} tux@${server} bash /home/tux/bin/guac setup
+		$SCP /home/$USER/bin/guac tux@${server}:/home/tux/bin/ && 
+		$SSH tux@${server} bash /home/tux/bin/guac setup
         done
 	echo "Your lab password is:"
         echo "${PASSWD}"
 	echo "Your server IP's are:"
         echo "${NAME}"
 	echo
-	echo "You can connect to the lab environment VM's"
-	echo "using this command"
-	echo "for line in ${IP}; do firefox --new-tab --url "$line:8080" & sleep 1 ; done"
         ;;
 
 remove)

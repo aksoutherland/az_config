@@ -58,11 +58,21 @@ fi
 
 source ${FILE1}
 
+# here we set the region
+REGION="centralus"
+
+# here we get the resource group name
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we are going to get a list of the IP's of the remote machines
+IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we get the lab station password
+PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
 # here we show you the password and the stations you will connect to
 echo "Your lab password is:"
 echo -e "${GREEN}${PASSWD}${NC}"
 echo "Your server IP's are:"
 echo -e "${GREEN}${NAME}${NC}"
 
-# this command will gather the IP's from your lab environment and open a new tab in firefox for each station
-echo "for line in ${IP}; do firefox --new-tab --url "$line:8080" & sleep 1 ; done"

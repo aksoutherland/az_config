@@ -17,8 +17,6 @@ else
         wget https://github.com/aksoutherland/az_config/raw/master/class.cfg -O /home/$USER/az_config/class.cfg
 fi
 
-# now we need to source the file so that we can use the variables to build our class environment
-source ${FILE}
 
 usage () {
 	echo
@@ -55,6 +53,7 @@ then
 
 elif [ -z "${COURSE}" ]
 then
+	RG=trainingimages
 	echo
 	echo "You are missing the course"
 	echo "Please specify the course code for the course you want to work with"
@@ -62,6 +61,55 @@ then
 	usage
 	exit
 fi
+
+# here we set the region
+REGION="centralus"
+
+# template source variables
+ENV_TMPL_SOURCE=${VM_TMPL_DIR}/course-environment.cfg.template
+VM_TMPL_SOURCE=${VM_TMPL_DIR}/template.azvm
+COURSE_TMPL_SOURCE=${VM_TMPL_DIR}/course-environment.cfg.template
+
+# modified template variables
+VM_TEMPLATE1=${VM_TMPL_DIR}/${COURSE}/${COURSE}-vm-template.azvm
+VM_TEMPLATE2=${VM_TMPL_DIR}/${COURSE}/${COURSE}-student${VM}.azvm
+COURSE_TEMPLATE=${VM_TMPL_DIR}/${COURSE}/${COURSE}.cfg
+
+# Here we are remapping some variables so that we don't have to edit the script each time we change to a different course
+sub1=VM_DISK_SIZE_${COURSE}
+sub2=VM_PASSWD_${COURSE}
+sub3=VM_SIZE_${COURSE}
+
+# here we get the resource group name
+export RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+
+# here we set the resource group name to be used for templates
+export TMPLRG=$(az group list -o table | sed -n '3 p' | cut -d " " -f1)
+
+# here we get the storage account name
+export ACCOUNT=$(az storage account list -o table | sed -n '4 p' | awk '{ print $9 }')
+
+# here we grab the storage account key
+export KEY=$(az storage account keys list --account-name ${ACCOUNT} --output table 2> /dev/null | grep "key1" | awk '{ print $4 }')
+
+# here we get the lab station password
+export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+
+# now we set the password
+export SSHPASS=${PASSWD}
+
+# here we are going to get a list of the IP's of the remote machines
+export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+
+# here we are going to get a list of HOSTNAME's and IP's of the remote machines
+export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
+
+# here we grab just the names without the IP's
+export VMNAME=$(az vm list -g ${RG} --query [].[name] --output tsv)
+
+# here we are setting the options for ssh and scp commands used in various scripts
+export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
 update_template () { 
 	mkdir ${VM_TMPL_DIR}/${COURSE}
