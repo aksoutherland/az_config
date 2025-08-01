@@ -94,35 +94,35 @@ sub2=VM_PASSWD_${COURSE}
 sub3=VM_SIZE_${COURSE} 
 
 # here we get the resource group name
-export RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
+RG=$(az group list -o table | grep ${COURSE}-${REGION} | cut -d " " -f1)
 
 # here we set the resource group name to be used for templates
-export TMPLRG=$(az group list -o table | sed -n '3 p' | cut -d " " -f1)
+TMPLRG=$(az group list -o table | sed -n '3 p' | cut -d " " -f1)
 
 # here we get the storage account name
-export ACCOUNT=$(az storage account list -o table | sed -n '4 p' | awk '{ print $9 }')
+ACCOUNT=$(az storage account list -o table | grep training | awk '{ print $9 }')
 
 # here we grab the storage account key
-export KEY=$(az storage account keys list --account-name ${ACCOUNT} --output table 2> /dev/null | grep "key1" | awk '{ print $4 }')
+KEY=$(az storage account keys list --account-name ${ACCOUNT} --output table 2> /dev/null | grep "key1" | awk '{ print $4 }')
 
 # here we get the lab station password
-export PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
+PASSWD=$(grep VM_PASSWD_${COURSE} /home/$USER/az_config/class.cfg | cut -d "=" -f 2 | tr -d \'\")
 
 # now we set the password
-export SSHPASS=${PASSWD}
+SSHPASS=${PASSWD}
 
 # here we are going to get a list of the IP's of the remote machines
-export IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
+IP=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $2}' | egrep -v 'Public|----')
 
 # here we are going to get a list of HOSTNAME's and IP's of the remote machines
-export NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
+NAME=$(az vm list-ip-addresses -g ${RG} --output table | awk '{print $1,$2}' | egrep -v 'Public|----')
 
 # here we grab just the names without the IP's
-export VMNAME=$(az vm list -g ${RG} --query [].[name] --output tsv)
+VMNAME=$(az vm list -g ${RG} --query [].[name] --output tsv)
 
 # here we are setting the options for ssh and scp commands used in various scripts
-export SCP="sshpass -e scp -o StrictHostKeyChecking=no"
-export SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
+SCP="sshpass -e scp -o StrictHostKeyChecking=no"
+SSH="sshpass -e ssh -o StrictHostKeyChecking=no"
 
 create_course () {
 	mkdir ${VM_TMPL_DIR}/${COURSE}
@@ -131,7 +131,7 @@ create_course () {
 		sed -i "s/COURSE_RESOURCE_GROUP_BASE_NAME=.*/COURSE_RESOURCE_GROUP_BASE_NAME="${COURSE}"/g" ${COURSE_TEMPLATE}
 		sed -i "s/COURSE_STORAGE_ACCOUNT_BASE_NAME=.*/COURSE_STORAGE_ACCOUNT_BASE_NAME="${COURSE}"/g" ${COURSE_TEMPLATE}
 		sed -i "s/COURSE_STORAGE_CONTAINER_NAME=.*/COURSE_STORAGE_CONTAINER_NAME="course-disks"/g" ${COURSE_TEMPLATE}
-		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=.*/IMAGE_SOURCE_RESOURCE_GROUP="${RG}"/g" ${COURSE_TEMPLATE}
+		sed -i "s/IMAGE_SOURCE_RESOURCE_GROUP=.*/IMAGE_SOURCE_RESOURCE_GROUP="${TMPLRG}"/g" ${COURSE_TEMPLATE}
 		sed -i "s/IMAGE_SOURCE_STORAGE_ACCOUNT=.*/IMAGE_SOURCE_STORAGE_ACCOUNT="${ACCOUNT}"/g" ${COURSE_TEMPLATE}
 		sed -i "s/IMAGE_SOURCE_CONTAINER_NAME=.*/IMAGE_SOURCE_CONTAINER_NAME="vhds"/g" ${COURSE_TEMPLATE}
 		sed -i "s/IMAGE_SOURCE_IMAGE_FILE=.*/IMAGE_SOURCE_IMAGE_FILE="${COURSE}-template-disk.vhd"/g" ${COURSE_TEMPLATE}
