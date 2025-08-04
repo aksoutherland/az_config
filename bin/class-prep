@@ -27,6 +27,7 @@ $COURSE)
 	bash ${HOMEBIN}guac-deploy.sh setup ${COURSE}
 	bash ${HOMEBIN}class-connect.sh ${COURSE}
 	bash ${HOMEBIN}class-dns ${COURSE}
+	bash ${HOMEBIN}lab-mgmt-start.sh ${COURSE}
 	;;
 *)
 	echo
